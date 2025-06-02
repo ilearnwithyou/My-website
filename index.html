@@ -63,6 +63,10 @@
         .count-valid {
             color: #10b981; /* Tailwind green-500 */
         }
+        /* Style pour cacher les champs templates */
+        .hidden-field-template {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -88,12 +92,16 @@
             <p id="invalidLinkMessage">Ce formulaire ne peut pas être utilisé sans un identifiant de destinataire valide dans l'URL (paramètre `formFor`).</p>
         </div>
 
-        <!-- Modification pour Netlify Forms: ajout de 'netlify' (ou data-netlify="true") et d'un nom au formulaire -->
         <form id="feedbackForm" name="feedback" netlify>
-            <!-- Champ caché pour le nom du formulaire, requis par Netlify si le nom est dynamique ou pour AJAX -->
             <input type="hidden" name="form-name" value="feedback" />
-            <!-- Champ caché pour stocker l'ID de la personne qui reçoit le feedback -->
             <input type="hidden" id="targetUserIdField" name="targetUserId" value="" />
+
+            {/* Champs cachés pour que Netlify reconnaisse les noms 'strength' et 'weakness' */}
+            <div class="hidden-field-template">
+                <input type="text" name="strength" value="">
+                <input type="text" name="weakness" value="">
+            </div>
+
 
             <div class="mb-6">
                 <label for="context" class="block text-sm font-medium text-gray-800 mb-1">Pour quel contexte souhaitez-vous donner du feedback ?</label>
@@ -177,9 +185,8 @@
         const shareableLinkEl = document.getElementById('shareableLink');
         const userUniqueIdDisplayEl = document.getElementById('userUniqueIdDisplay');
         const invalidLinkSection = document.getElementById('invalidLinkSection');
-        // const invalidLinkMessageEl = document.getElementById('invalidLinkMessage'); // Plus utilisé directement
         const feedbackForm = document.getElementById('feedbackForm'); 
-        const targetUserIdField = document.getElementById('targetUserIdField'); // Champ caché
+        const targetUserIdField = document.getElementById('targetUserIdField'); 
         const contextSelect = document.getElementById('context');
         const overallInstruction = document.getElementById('overallInstruction');
         const entryCounterDiv = document.getElementById('entryCounter');
@@ -273,7 +280,7 @@
             for (let i = 0; i < NUM_INPUTS_PER_CATEGORY; i++) {
                 const strengthInput = document.createElement('input');
                 strengthInput.type = 'text';
-                strengthInput.name = 'strength'; // Important pour Netlify Forms pour grouper les champs
+                strengthInput.name = 'strength'; 
                 strengthInput.placeholder = `Atout #${i + 1}`;
                 strengthInput.className = 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2';
                 strengthInput.addEventListener('input', updateEntryCounter);
@@ -281,7 +288,7 @@
 
                 const weaknessInput = document.createElement('input');
                 weaknessInput.type = 'text';
-                weaknessInput.name = 'weakness'; // Important pour Netlify Forms pour grouper les champs
+                weaknessInput.name = 'weakness'; 
                 weaknessInput.placeholder = `Point d'amélioration #${i + 1}`;
                 weaknessInput.className = 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2';
                 weaknessInput.addEventListener('input', updateEntryCounter);
@@ -299,30 +306,24 @@
         
         if(feedbackForm) {
             feedbackForm.addEventListener('submit', async (event) => {
-                event.preventDefault(); // Empêche la soumission HTML classique au début
+                event.preventDefault(); 
 
                 const totalFilledCount = countFilledInputs();
                 if (totalFilledCount !== TOTAL_ADJECTIVES_REQUIRED) {
                      showModal("Validation Échouée", `Veuillez fournir un total exact de ${TOTAL_ADJECTIVES_REQUIRED} descriptions (atouts et/ou faiblesses). Vous en avez actuellement fourni ${totalFilledCount}.`);
-                    return; // Empêche la soumission si la validation échoue
+                    return; 
                 }
                 
-                // Si la validation JS passe, on prépare la soumission pour Netlify
                 if(submitButton) {
                     submitButton.disabled = true;
                     submitButton.innerHTML = '<div class="spinner !w-5 !h-5 !border-2 !m-0 inline-block mr-2"></div>Envoi en cours...';
                 }
 
-                // Création d'un objet FormData à partir du formulaire
                 const formData = new FormData(feedbackForm);
-                
-                // Pour Netlify AJAX submission, il faut encoder les données
                 const body = new URLSearchParams(formData).toString();
 
                 try {
-                    // Soumission à Netlify via fetch. L'action du formulaire est la page actuelle par défaut.
-                    // Netlify attend un POST avec `application/x-www-form-urlencoded`
-                    const response = await fetch("/", { // Ou l'action spécifiée dans votre form si différente
+                    const response = await fetch("/", { 
                         method: "POST",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: body,
@@ -337,7 +338,6 @@
                         if(overallInstruction) overallInstruction.style.display = 'none';
                         if(entryCounterDiv) entryCounterDiv.style.display = 'none'; 
                     } else {
-                        // Gérer les erreurs de réponse de Netlify
                         const errorText = await response.text();
                         console.error("Erreur de soumission à Netlify:", response.status, errorText);
                         showModal("Erreur de Soumission", `Une erreur est survenue lors de la soumission du formulaire à Netlify (status: ${response.status}). Veuillez réessayer.`);
@@ -360,7 +360,7 @@
 
             if (formForIdFromUrl) { 
                 targetUserId = formForIdFromUrl;
-                if(targetUserIdField) targetUserIdField.value = targetUserId; // Remplir le champ caché
+                if(targetUserIdField) targetUserIdField.value = targetUserId; 
                 console.log(`Formulaire pour donner du feedback à l'utilisateur : ${targetUserId}`);
                 if(shareLinkSection) shareLinkSection.style.display = 'none';
                 if(invalidLinkSection) invalidLinkSection.style.display = 'none';
@@ -368,7 +368,7 @@
             } else { 
                 generatedUserShareId = generateUUID(); 
                 targetUserId = generatedUserShareId; 
-                if(targetUserIdField) targetUserIdField.value = targetUserId; // Remplir le champ caché
+                if(targetUserIdField) targetUserIdField.value = targetUserId; 
                 
                 console.log(`L'utilisateur veut obtenir son lien partageable. Son ID généré est : ${generatedUserShareId}.`);
                 const shareUrl = `${window.location.origin}${window.location.pathname}?formFor=${generatedUserShareId}`;
@@ -393,7 +393,7 @@
             if(loadingOverlay) loadingOverlay.style.display = 'none';
         }
         
-        main(); // Exécuter main directement
+        main(); 
         
     </script>
 </body>
