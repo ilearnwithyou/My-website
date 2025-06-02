@@ -27,14 +27,11 @@
         .card textarea {
             flex-grow: 1;
             background-color: transparent;
-            /* Réinitialisation de bordure plus explicite */
-            border-style: none;
-            border-width: 0px;
-            border-color: transparent; /* Au cas où */
-            /* Supprimer toute outline ou ombre par défaut du navigateur sur l'élément lui-même */
-            outline: none;
-            box-shadow: none;
-            /* Tentative de suppression du style natif du navigateur */
+            /* Réinitialisation de bordure plus explicite et agressive */
+            border: none !important; /* Assure la suppression de toute bordure */
+            outline: none !important; /* Assure la suppression de tout contour */
+            box-shadow: none !important; /* Assure la suppression de toute ombre */
+            
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -45,10 +42,13 @@
             font-family: 'Inter', sans-serif;
             color: #212121; 
         }
-        .card:focus-within, .card textarea:focus { /* Apply focus to card when textarea is focused */
+        .card:focus-within { /* Appliquer l'effet de focus sur la carte entière lorsque le textarea est focus */
             transform: scale(1.03);
             box-shadow: 0 0 0 3px var(--focus-ring-color, #C8E6C9), 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); /* shadow-lg */
         }
+        /* Retirer le :focus spécifique sur textarea s'il crée un double effet avec :focus-within sur .card */
+        /* .card textarea:focus { ... } */
+
         .strength-card {
             background-color: #E8F5E9;
             --focus-ring-color: #A5D6A7; 
@@ -172,13 +172,8 @@
             <input type="hidden" name="form-name" value="feedback" />
             
             <div class="hidden-field-template">
-                {/* Add examples of ALL dynamically generated field name patterns Netlify needs to see */}
-                {/* Example for one context (e.g., 'vulgarisation') and one card index (e.g., '0') */}
                 <input type="text" name="strength-vulgarisation-0" value="">
                 <input type="text" name="improvement-vulgarisation-0" value="">
-                {/* You might want to add one for each context if Netlify is still picky, 
-                    but often one example of the pattern is enough. 
-                    The custom_context_name_autre is already specific. */}
                 <input type="text" name="custom_context_name_autre" value="">
             </div>
             
