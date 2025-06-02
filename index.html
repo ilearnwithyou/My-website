@@ -175,54 +175,28 @@
             <input type="hidden" name="form-name" value="feedback" />
             
             <div class="hidden-field-template">
-                <script id="netlify-hidden-fields-script">
-                    const hiddenFieldContexts = [
-                        { id: "vulgarisation" }, { id: "interaction" }, { id: "animation" },
-                        { id: "improvisation" }, { id: "structuration" }, { id: "accompagnement" },
-                        { id: "posture" }, { id: "adaptabilite" }, { id: "transmission" },
-                        { id: "ouverture" }, { id: "autre" }
-                    ];
-                    const hiddenFieldTypes = ['strength', 'improvement'];
-                    const hiddenFieldIndices = [0, 1, 2, 3, 4]; // 5 cards per axe
-
-                    let fieldsHTML = '';
-                    hiddenFieldContexts.forEach(context => {
-                        hiddenFieldTypes.forEach(type => {
-                            hiddenFieldIndices.forEach(index => {
-                                fieldsHTML += `<input type="text" name="${type}-${context.id}-${index}" value="">\n`;
-                            });
-                        });
-                    });
-                    fieldsHTML += `<input type="text" name="custom_context_name_autre" value="">\n`;
-                    // This script block itself will be removed by the browser, 
-                    // but its content (the input fields) will be parsed by Netlify if this script runs during build.
-                    // For pure static HTML, we'd paste the output of this script here.
-                    // Since this is a live HTML page, we can let JS create these for the DOM,
-                    // but Netlify's bot won't run this JS. So, they must be physically in the HTML.
-                    // The below is a static representation for Netlify's bot.
-                </script>
-                <input type="text" name="strength-vulgarisation-0" value=""><input type="text" name="strength-vulgarisation-1" value=""><input type="text" name="strength-vulgarisation-2" value=""><input type="text" name="strength-vulgarisation-3" value=""><input type="text" name="strength-vulgarisation-4" value="">
-                <input type="text" name="improvement-vulgarisation-0" value=""><input type="text" name="improvement-vulgarisation-1" value=""><input type="text" name="improvement-vulgarisation-2" value=""><input type="text" name="improvement-vulgarisation-3" value=""><input type="text" name="improvement-vulgarisation-4" value="">
-                <input type="text" name="strength-interaction-0" value=""><input type="text" name="strength-interaction-1" value=""><input type="text" name="strength-interaction-2" value=""><input type="text" name="strength-interaction-3" value=""><input type="text" name="strength-interaction-4" value="">
-                <input type="text" name="improvement-interaction-0" value=""><input type="text" name="improvement-interaction-1" value=""><input type="text" name="improvement-interaction-2" value=""><input type="text" name="improvement-interaction-3" value=""><input type="text" name="improvement-interaction-4" value="">
-                <input type="text" name="strength-animation-0" value=""><input type="text" name="strength-animation-1" value=""><input type="text" name="strength-animation-2" value=""><input type="text" name="strength-animation-3" value=""><input type="text" name="strength-animation-4" value="">
-                <input type="text" name="improvement-animation-0" value=""><input type="text" name="improvement-animation-1" value=""><input type="text" name="improvement-animation-2" value=""><input type="text" name="improvement-animation-3" value=""><input type="text" name="improvement-animation-4" value="">
-                <input type="text" name="strength-improvisation-0" value=""><input type="text" name="strength-improvisation-1" value=""><input type="text" name="strength-improvisation-2" value=""><input type="text" name="strength-improvisation-3" value=""><input type="text" name="strength-improvisation-4" value="">
-                <input type="text" name="improvement-improvisation-0" value=""><input type="text" name="improvement-improvisation-1" value=""><input type="text" name="improvement-improvisation-2" value=""><input type="text" name="improvement-improvisation-3" value=""><input type="text" name="improvement-improvisation-4" value="">
-                <input type="text" name="strength-structuration-0" value=""><input type="text" name="strength-structuration-1" value=""><input type="text" name="strength-structuration-2" value=""><input type="text" name="strength-structuration-3" value=""><input type="text" name="strength-structuration-4" value="">
-                <input type="text" name="improvement-structuration-0" value=""><input type="text" name="improvement-structuration-1" value=""><input type="text" name="improvement-structuration-2" value=""><input type="text" name="improvement-structuration-3" value=""><input type="text" name="improvement-structuration-4" value="">
-                <input type="text" name="strength-accompagnement-0" value=""><input type="text" name="strength-accompagnement-1" value=""><input type="text" name="strength-accompagnement-2" value=""><input type="text" name="strength-accompagnement-3" value=""><input type="text" name="strength-accompagnement-4" value="">
-                <input type="text" name="improvement-accompagnement-0" value=""><input type="text" name="improvement-accompagnement-1" value=""><input type="text" name="improvement-accompagnement-2" value=""><input type="text" name="improvement-accompagnement-3" value=""><input type="text" name="improvement-accompagnement-4" value="">
-                <input type="text" name="strength-posture-0" value=""><input type="text" name="strength-posture-1" value=""><input type="text" name="strength-posture-2" value=""><input type="text" name="strength-posture-3" value=""><input type="text" name="strength-posture-4" value="">
-                <input type="text" name="improvement-posture-0" value=""><input type="text" name="improvement-posture-1" value=""><input type="text" name="improvement-posture-2" value=""><input type="text" name="improvement-posture-3" value=""><input type="text" name="improvement-posture-4" value="">
-                <input type="text" name="strength-adaptabilite-0" value=""><input type="text" name="strength-adaptabilite-1" value=""><input type="text" name="strength-adaptabilite-2" value=""><input type="text" name="strength-adaptabilite-3" value=""><input type="text" name="strength-adaptabilite-4" value="">
-                <input type="text" name="improvement-adaptabilite-0" value=""><input type="text" name="improvement-adaptabilite-1" value=""><input type="text" name="improvement-adaptabilite-2" value=""><input type="text" name="improvement-adaptabilite-3" value=""><input type="text" name="improvement-adaptabilite-4" value="">
-                <input type="text" name="strength-transmission-0" value=""><input type="text" name="strength-transmission-1" value=""><input type="text" name="strength-transmission-2" value=""><input type="text" name="strength-transmission-3" value=""><input type="text" name="strength-transmission-4" value="">
-                <input type="text" name="improvement-transmission-0" value=""><input type="text" name="improvement-transmission-1" value=""><input type="text" name="improvement-transmission-2" value=""><input type="text" name="improvement-transmission-3" value=""><input type="text" name="improvement-transmission-4" value="">
-                <input type="text" name="strength-ouverture-0" value=""><input type="text" name="strength-ouverture-1" value=""><input type="text" name="strength-ouverture-2" value=""><input type="text" name="strength-ouverture-3" value=""><input type="text" name="strength-ouverture-4" value="">
-                <input type="text" name="improvement-ouverture-0" value=""><input type="text" name="improvement-ouverture-1" value=""><input type="text" name="improvement-ouverture-2" value=""><input type="text" name="improvement-ouverture-3" value=""><input type="text" name="improvement-ouverture-4" value="">
-                <input type="text" name="strength-autre-0" value=""><input type="text" name="strength-autre-1" value=""><input type="text" name="strength-autre-2" value=""><input type="text" name="strength-autre-3" value=""><input type="text" name="strength-autre-4" value="">
-                <input type="text" name="improvement-autre-0" value=""><input type="text" name="improvement-autre-1" value=""><input type="text" name="improvement-autre-2" value=""><input type="text" name="improvement-autre-3" value=""><input type="text" name="improvement-autre-4" value="">
+                <input type="text" name="Atout-vulgarisation-1" value=""><input type="text" name="Atout-vulgarisation-2" value=""><input type="text" name="Atout-vulgarisation-3" value=""><input type="text" name="Atout-vulgarisation-4" value=""><input type="text" name="Atout-vulgarisation-5" value="">
+                <input type="text" name="Amelioration-vulgarisation-1" value=""><input type="text" name="Amelioration-vulgarisation-2" value=""><input type="text" name="Amelioration-vulgarisation-3" value=""><input type="text" name="Amelioration-vulgarisation-4" value=""><input type="text" name="Amelioration-vulgarisation-5" value="">
+                <input type="text" name="Atout-interaction-1" value=""><input type="text" name="Atout-interaction-2" value=""><input type="text" name="Atout-interaction-3" value=""><input type="text" name="Atout-interaction-4" value=""><input type="text" name="Atout-interaction-5" value="">
+                <input type="text" name="Amelioration-interaction-1" value=""><input type="text" name="Amelioration-interaction-2" value=""><input type="text" name="Amelioration-interaction-3" value=""><input type="text" name="Amelioration-interaction-4" value=""><input type="text" name="Amelioration-interaction-5" value="">
+                <input type="text" name="Atout-animation-1" value=""><input type="text" name="Atout-animation-2" value=""><input type="text" name="Atout-animation-3" value=""><input type="text" name="Atout-animation-4" value=""><input type="text" name="Atout-animation-5" value="">
+                <input type="text" name="Amelioration-animation-1" value=""><input type="text" name="Amelioration-animation-2" value=""><input type="text" name="Amelioration-animation-3" value=""><input type="text" name="Amelioration-animation-4" value=""><input type="text" name="Amelioration-animation-5" value="">
+                <input type="text" name="Atout-improvisation-1" value=""><input type="text" name="Atout-improvisation-2" value=""><input type="text" name="Atout-improvisation-3" value=""><input type="text" name="Atout-improvisation-4" value=""><input type="text" name="Atout-improvisation-5" value="">
+                <input type="text" name="Amelioration-improvisation-1" value=""><input type="text" name="Amelioration-improvisation-2" value=""><input type="text" name="Amelioration-improvisation-3" value=""><input type="text" name="Amelioration-improvisation-4" value=""><input type="text" name="Amelioration-improvisation-5" value="">
+                <input type="text" name="Atout-structuration-1" value=""><input type="text" name="Atout-structuration-2" value=""><input type="text" name="Atout-structuration-3" value=""><input type="text" name="Atout-structuration-4" value=""><input type="text" name="Atout-structuration-5" value="">
+                <input type="text" name="Amelioration-structuration-1" value=""><input type="text" name="Amelioration-structuration-2" value=""><input type="text" name="Amelioration-structuration-3" value=""><input type="text" name="Amelioration-structuration-4" value=""><input type="text" name="Amelioration-structuration-5" value="">
+                <input type="text" name="Atout-accompagnement-1" value=""><input type="text" name="Atout-accompagnement-2" value=""><input type="text" name="Atout-accompagnement-3" value=""><input type="text" name="Atout-accompagnement-4" value=""><input type="text" name="Atout-accompagnement-5" value="">
+                <input type="text" name="Amelioration-accompagnement-1" value=""><input type="text" name="Amelioration-accompagnement-2" value=""><input type="text" name="Amelioration-accompagnement-3" value=""><input type="text" name="Amelioration-accompagnement-4" value=""><input type="text" name="Amelioration-accompagnement-5" value="">
+                <input type="text" name="Atout-posture-1" value=""><input type="text" name="Atout-posture-2" value=""><input type="text" name="Atout-posture-3" value=""><input type="text" name="Atout-posture-4" value=""><input type="text" name="Atout-posture-5" value="">
+                <input type="text" name="Amelioration-posture-1" value=""><input type="text" name="Amelioration-posture-2" value=""><input type="text" name="Amelioration-posture-3" value=""><input type="text" name="Amelioration-posture-4" value=""><input type="text" name="Amelioration-posture-5" value="">
+                <input type="text" name="Atout-adaptabilite-1" value=""><input type="text" name="Atout-adaptabilite-2" value=""><input type="text" name="Atout-adaptabilite-3" value=""><input type="text" name="Atout-adaptabilite-4" value=""><input type="text" name="Atout-adaptabilite-5" value="">
+                <input type="text" name="Amelioration-adaptabilite-1" value=""><input type="text" name="Amelioration-adaptabilite-2" value=""><input type="text" name="Amelioration-adaptabilite-3" value=""><input type="text" name="Amelioration-adaptabilite-4" value=""><input type="text" name="Amelioration-adaptabilite-5" value="">
+                <input type="text" name="Atout-transmission-1" value=""><input type="text" name="Atout-transmission-2" value=""><input type="text" name="Atout-transmission-3" value=""><input type="text" name="Atout-transmission-4" value=""><input type="text" name="Atout-transmission-5" value="">
+                <input type="text" name="Amelioration-transmission-1" value=""><input type="text" name="Amelioration-transmission-2" value=""><input type="text" name="Amelioration-transmission-3" value=""><input type="text" name="Amelioration-transmission-4" value=""><input type="text" name="Amelioration-transmission-5" value="">
+                <input type="text" name="Atout-ouverture-1" value=""><input type="text" name="Atout-ouverture-2" value=""><input type="text" name="Atout-ouverture-3" value=""><input type="text" name="Atout-ouverture-4" value=""><input type="text" name="Atout-ouverture-5" value="">
+                <input type="text" name="Amelioration-ouverture-1" value=""><input type="text" name="Amelioration-ouverture-2" value=""><input type="text" name="Amelioration-ouverture-3" value=""><input type="text" name="Amelioration-ouverture-4" value=""><input type="text" name="Amelioration-ouverture-5" value="">
+                <input type="text" name="Atout-autre-1" value=""><input type="text" name="Atout-autre-2" value=""><input type="text" name="Atout-autre-3" value=""><input type="text" name="Atout-autre-4" value=""><input type="text" name="Atout-autre-5" value="">
+                <input type="text" name="Amelioration-autre-1" value=""><input type="text" name="Amelioration-autre-2" value=""><input type="text" name="Amelioration-autre-3" value=""><input type="text" name="Amelioration-autre-4" value=""><input type="text" name="Amelioration-autre-5" value="">
                 <input type="text" name="custom_context_name_autre" value="">
             </div>
             
@@ -306,11 +280,12 @@
 
         function createCard(type, contextId, cardIndex) {
             const cardDiv = document.createElement('div');
-            cardDiv.className = `card ${type === 'strength' ? 'strength-card' : 'improvement-card'}`;
+            cardDiv.className = `card ${type === 'Atout' ? 'strength-card' : 'improvement-card'}`;
             
             const textarea = document.createElement('textarea');
-            textarea.name = `${type === 'strength' ? 'strength' : 'improvement'}-${contextId}-${cardIndex}`;
-            textarea.placeholder = type === 'strength' ? `Atout #${cardIndex + 1}` : `Amélioration #${cardIndex + 1}`;
+            // Utiliser la nouvelle convention de nommage
+            textarea.name = `${type}-${contextId}-${cardIndex + 1}`; // Indexation à partir de 1
+            textarea.placeholder = `${type} #${cardIndex + 1}`;
             textarea.maxLength = MAX_CHARS_PER_CARD;
             
             const charCounter = document.createElement('div');
@@ -331,9 +306,9 @@
             const contextBlock = document.getElementById(`context-block-${contextId}`);
             if (!contextBlock) return 0;
 
-            const filledStrengthsCount = Array.from(contextBlock.querySelectorAll('textarea[name^="strength-"]'))
+            const filledStrengthsCount = Array.from(contextBlock.querySelectorAll('textarea[name^="Atout-"]'))
                                          .filter(textarea => textarea.value.trim() !== '').length;
-            const filledImprovementsCount = Array.from(contextBlock.querySelectorAll('textarea[name^="improvement-"]'))
+            const filledImprovementsCount = Array.from(contextBlock.querySelectorAll('textarea[name^="Amelioration-"]'))
                                           .filter(textarea => textarea.value.trim() !== '').length;
             return filledStrengthsCount + filledImprovementsCount;
         }
@@ -407,12 +382,12 @@
                 
                 const strengthsRow1 = document.createElement('div');
                 strengthsRow1.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4';
-                for(let i=0; i < 3; i++) strengthsRow1.appendChild(createCard('strength', context.id, i));
+                for(let i=0; i < 3; i++) strengthsRow1.appendChild(createCard('Atout', context.id, i));
                 strengthsSection.appendChild(strengthsRow1);
 
                 const strengthsRow2 = document.createElement('div');
                 strengthsRow2.className = 'flex justify-center gap-4 flex-wrap'; 
-                for(let i=3; i < CARDS_PER_AXE; i++) strengthsRow2.appendChild(createCard('strength', context.id, i));
+                for(let i=3; i < CARDS_PER_AXE; i++) strengthsRow2.appendChild(createCard('Atout', context.id, i));
                 strengthsSection.appendChild(strengthsRow2);
                 content.appendChild(strengthsSection);
 
@@ -422,12 +397,12 @@
 
                 const improvementsRow1 = document.createElement('div');
                 improvementsRow1.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4';
-                for(let i=0; i < 3; i++) improvementsRow1.appendChild(createCard('improvement', context.id, i));
+                for(let i=0; i < 3; i++) improvementsRow1.appendChild(createCard('Amelioration', context.id, i));
                 improvementsSection.appendChild(improvementsRow1);
 
                 const improvementsRow2 = document.createElement('div');
                 improvementsRow2.className = 'flex justify-center gap-4 flex-wrap';
-                for(let i=3; i < CARDS_PER_AXE; i++) improvementsRow2.appendChild(createCard('improvement', context.id, i));
+                for(let i=3; i < CARDS_PER_AXE; i++) improvementsRow2.appendChild(createCard('Amelioration', context.id, i));
                 improvementsSection.appendChild(improvementsRow2);
                 content.appendChild(improvementsSection);
 
