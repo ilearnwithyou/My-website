@@ -27,8 +27,18 @@
         .card textarea {
             flex-grow: 1;
             background-color: transparent;
-            border: none;
+            /* Réinitialisation de bordure plus explicite */
+            border-style: none;
+            border-width: 0px;
+            border-color: transparent; /* Au cas où */
+            /* Supprimer toute outline ou ombre par défaut du navigateur sur l'élément lui-même */
             outline: none;
+            box-shadow: none;
+            /* Tentative de suppression du style natif du navigateur */
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+
             resize: none;
             width: 100%;
             height: 100%;
