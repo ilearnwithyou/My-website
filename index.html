@@ -144,6 +144,15 @@
             font-size: 1.5em; /* Bigger star */
             margin-right: 0.5rem;
         }
+        #personalizedMessageContainer p {
+            font-style: italic;
+            color: #4A5568; /* Tailwind gray-700 */
+            /* Style for the personalized message, can be adjusted */
+        }
+         #personalizedMessageContainer p strong {
+            color: #4C51BF; /* Tailwind indigo-700 for the number, or your preferred blue */
+            font-weight: 700; /* Poppins bold */
+        }
 
     </style>
 </head>
@@ -225,6 +234,42 @@
         const feedbackSummaryDiv = document.getElementById('feedbackSummary');
         const personalizedMessageContainerDiv = document.getElementById('personalizedMessageContainer');
         
+        const thankYouMessages = [
+            "Chaque retour est une boussole. Merci pour ces <strong>somme_étoiles</strong> indications qui m'aident à affiner la mienne !",
+            "Je repars avec <strong>somme_étoiles</strong> pistes concrètes pour progresser et mieux transmettre. Un grand merci !",
+            "Ces <strong>somme_étoiles</strong> retours sont autant de graines semées. Certaines confirment mes racines, d'autres me poussent à grandir différemment. Merci pour votre regard.",
+            "Votre perspective est un cadeau précieux. Merci pour ces <strong>somme_étoiles</strong> éclairages !",
+            "Merci pour ces <strong>somme_étoiles</strong> retours ! C'est avec des échanges comme celui-ci que l'on avance.",
+            "<strong>Somme_étoiles</strong> étoiles pour guider mes prochains pas. Un grand merci !",
+            "Votre franchise est appréciée. Ces <strong>somme_étoiles</strong> retours vont m'être très utiles.",
+            "Merci d'avoir pris le temps de partager ces <strong>somme_étoiles</strong> réflexions constructives.",
+            "C'est noté ! <strong>Somme_étoiles</strong> points à méditer et à travailler. Merci beaucoup.",
+            "<strong>Somme_étoiles</strong> pépites d'or dans vos retours. Merci pour votre générosité !",
+            "Votre feedback est une source d'inspiration. Merci pour ces <strong>somme_étoiles</strong> contributions !",
+            "Je suis touché(e) par la qualité de vos <strong>somme_étoiles</strong> retours. Merci !",
+            "Merci pour ce miroir ! <strong>Somme_étoiles</strong> reflets qui vont m'aider à évoluer.",
+            "Ces <strong>somme_étoiles</strong> observations sont très pertinentes. Merci de m'aider à voir plus clair.",
+            "Un grand merci pour ces <strong>somme_étoiles</strong> partages, c'est très enrichissant.",
+            "Chaque feedback est une chance de s'améliorer. Merci pour ces <strong>somme_étoiles</strong> opportunités !",
+            "<strong>Somme_étoiles</strong> nouvelles perspectives grâce à vous. Merci infiniment !",
+            "Votre regard extérieur est essentiel. Merci pour ces <strong>somme_étoiles</strong> points de vue.",
+            "Merci pour votre temps et ces <strong>somme_étoiles</strong> retours détaillés.",
+            "C'est grâce à des retours comme les vôtres (<strong>somme_étoiles</strong> au total !) que je peux m'ajuster.",
+            "<strong>Somme_étoiles</strong> encouragements et pistes à explorer. Merci pour cet élan !",
+            "Je prends note de chaque étoile. Merci pour ces <strong>somme_étoiles</strong> précieux conseils.",
+            "Votre contribution est très appréciée. Merci pour ces <strong>somme_étoiles</strong> retours !",
+            "Merci de m'offrir <strong>somme_étoiles</strong> directions pour m'améliorer.",
+            "Ces <strong>somme_étoiles</strong> retours sont une vraie mine d'informations. Merci !",
+            "Un immense merci pour votre implication et ces <strong>somme_étoiles</strong> feedbacks.",
+            "<strong>Somme_étoiles</strong> points qui vont nourrir ma réflexion. Merci pour votre aide !",
+            "Je suis reconnaissant(e) pour ces <strong>somme_étoiles</strong> partages. Merci !",
+            "Votre feedback compte beaucoup. Merci pour ces <strong>somme_étoiles</strong> étoiles !",
+            "Merci pour ce regard constructif et ces <strong>somme_étoiles</strong> pistes de développement.",
+            "Avec <strong>somme_étoiles</strong> retours comme ceux-ci, le chemin de l'amélioration est plus clair. Merci !",
+            "Ces <strong>somme_étoiles</strong> points de vue sont comme des phares dans la nuit. Merci !",
+            "Merci d'avoir partagé <strong>somme_étoiles</strong> pensées si constructives !"
+        ];
+
         function showModal(title, message, onCloseButtonClickCallback, atoutsCount, ameliorationsCount, personalizedMessageText) {
             if (modalTitle && modalMessage && messageModal && modalCloseButton && feedbackSummaryDiv && personalizedMessageContainerDiv) { 
                 modalTitle.textContent = title;
@@ -245,7 +290,7 @@
                 feedbackSummaryDiv.innerHTML = summaryHTML;
 
                 if (personalizedMessageText) {
-                    personalizedMessageContainerDiv.innerHTML = `<p class="text-md font-semibold text-indigo-700 mt-4 pt-4 border-t">${personalizedMessageText}</p>`;
+                    personalizedMessageContainerDiv.innerHTML = `<p class="text-md text-indigo-700 mt-4 pt-4 border-t">${personalizedMessageText}</p>`; // Removed font-semibold for a softer look, kept indigo
                 } else {
                     personalizedMessageContainerDiv.innerHTML = ""; 
                 }
@@ -545,27 +590,17 @@
                 const processedFormData = new FormData();
                 processedFormData.append('form-name', feedbackForm.getAttribute('name') || 'feedback');
                 
-                let totalStandardAtouts = 0;
-                let totalStandardAmeliorations = 0;
-                let customContextAtouts = 0;
-                let customContextAmeliorations = 0;
+                let totalAtoutsSubmittedForSummary = 0;
+                let totalAmeliorationsSubmittedForSummary = 0;
 
                 feedbackForm.querySelectorAll('textarea').forEach(textarea => {
                     const value = textarea.value.trim();
                     if (value) { 
                         processedFormData.append(textarea.name, value);
-                        if (textarea.name.includes('-autre-')) {
-                            if (textarea.name.startsWith('Atout-')) {
-                                customContextAtouts++;
-                            } else if (textarea.name.startsWith('Amelioration-')) {
-                                customContextAmeliorations++;
-                            }
-                        } else {
-                            if (textarea.name.startsWith('Atout-')) {
-                                totalStandardAtouts++;
-                            } else if (textarea.name.startsWith('Amelioration-')) {
-                                totalStandardAmeliorations++;
-                            }
+                        if (textarea.name.startsWith('Atout-')) {
+                            totalAtoutsSubmittedForSummary++;
+                        } else if (textarea.name.startsWith('Amelioration-')) {
+                            totalAmeliorationsSubmittedForSummary++;
                         }
                     }
                 });
@@ -573,15 +608,15 @@
                 if(customContextNameInput && customContextNameInput.value.trim()){
                     processedFormData.append(customContextNameInput.name, customContextNameInput.value.trim());
                 }
-
-                const percentageFromStandard = (totalStandardAtouts + totalStandardAmeliorations) * 2;
-                let finalReportedPercentage = percentageFromStandard;
-                finalReportedPercentage += (customContextAtouts * 4);
-                finalReportedPercentage -= (customContextAmeliorations * 4);
-
-                const personalizedMessage = `Grâce à vous, j'ai identifié <strong>${finalReportedPercentage}%</strong> de nouvelles voies d'amélioration et de confirmation de mes points forts !`;
-                const totalAtoutsSubmittedForSummary = totalStandardAtouts + customContextAtouts;
-                const totalAmeliorationsSubmittedForSummary = totalStandardAmeliorations + customContextAmeliorations;
+                
+                const totalSubmittedStars = totalAtoutsSubmittedForSummary + totalAmeliorationsSubmittedForSummary;
+                let personalizedMessage = "";
+                if (totalSubmittedStars > 0) {
+                    const randomIndex = Math.floor(Math.random() * thankYouMessages.length);
+                    personalizedMessage = thankYouMessages[randomIndex].replace('somme_étoiles', `<strong>${totalSubmittedStars}</strong>`);
+                } else {
+                    personalizedMessage = "Merci d'avoir pris le temps de consulter ce formulaire.";
+                }
 
 
                 const body = new URLSearchParams(processedFormData).toString();
