@@ -67,6 +67,10 @@
         .hidden-field-template {
             display: none !important;
         }
+        /* La classe .truly-hidden-text n'est plus nécessaire pour le commentaire spécifique, mais peut être gardée pour d'autres usages si besoin */
+        .truly-hidden-text {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -81,27 +85,27 @@
             <p class="text-gray-600 mt-2">Vos retours sont précieux. Merci de faire preuve de franchise et de bienveillance.</p>
         </header>
 
-        <div id="shareLinkSection" class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-md" style="display: none;">
-            <h2 class="font-semibold">Partagez ce lien pour recevoir du feedback :</h2>
-            <p id="shareableLink" class="mt-1 break-all bg-blue-100 p-2 rounded"></p>
-            <p class="mt-2 text-sm">Votre identifiant unique (pour référence) : <strong id="userUniqueIdDisplay"></strong></p>
+        <div id="shareLinkInfo" class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-md">
+            <h2 class="font-semibold">Lien d'accès au formulaire :</h2>
+            <p id="formAccessLink" class="mt-1 break-all bg-blue-100 p-2 rounded">https://formyform.netlify.app/</p>
+            <p class="mt-2 text-sm">Partagez ce lien avec vos collègues pour qu'ils puissent soumettre leur feedback.</p>
         </div>
         
-        <div id="invalidLinkSection" class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md" style="display: none;">
-            <h2 class="font-semibold">Lien Invalide</h2>
-            <p id="invalidLinkMessage">Ce formulaire ne peut pas être utilisé sans un identifiant de destinataire valide dans l'URL (paramètre `formFor`).</p>
-        </div>
+        <!-- La section invalidLinkSection n'est plus nécessaire car il n'y a plus de paramètre d'URL à valider pour le destinataire -->
 
         <form id="feedbackForm" name="feedback" netlify>
             <input type="hidden" name="form-name" value="feedback" />
-            <input type="hidden" id="targetUserIdField" name="targetUserId" value="" />
+            <!-- Le champ targetUserIdField n'est plus nécessaire -->
 
-            {/* Champs cachés pour que Netlify reconnaisse les noms 'strength' et 'weakness' */}
+            <!-- Commentaire HTML pour les développeurs, ne s'affichera pas -->
+            <!-- Champs cachés pour que Netlify reconnaisse les noms 'strength' et 'weakness' -->
+            
+            <!-- Commentaire HTML pour les développeurs, ne s'affichera pas -->
+            <!-- Champs cachés pour que Netlify reconnaisse les noms 'strength' et 'weakness' lors du build -->
             <div class="hidden-field-template">
                 <input type="text" name="strength" value="">
                 <input type="text" name="weakness" value="">
             </div>
-
 
             <div class="mb-6">
                 <label for="context" class="block text-sm font-medium text-gray-800 mb-1">Pour quel contexte souhaitez-vous donner du feedback ?</label>
@@ -151,7 +155,6 @@
     </div>
 
     <script type="module">
-        // Declare modal DOM elements constants *before* showModal function
         const messageModal = document.getElementById('messageModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalMessage = document.getElementById('modalMessage');
@@ -177,16 +180,8 @@
             }
         }
         
-        let targetUserId = null; 
-        let generatedUserShareId = null; 
-
         const loadingOverlay = document.getElementById('loading-overlay');
-        const shareLinkSection = document.getElementById('shareLinkSection');
-        const shareableLinkEl = document.getElementById('shareableLink');
-        const userUniqueIdDisplayEl = document.getElementById('userUniqueIdDisplay');
-        const invalidLinkSection = document.getElementById('invalidLinkSection');
         const feedbackForm = document.getElementById('feedbackForm'); 
-        const targetUserIdField = document.getElementById('targetUserIdField'); 
         const contextSelect = document.getElementById('context');
         const overallInstruction = document.getElementById('overallInstruction');
         const entryCounterDiv = document.getElementById('entryCounter');
@@ -206,10 +201,6 @@
 
         const NUM_INPUTS_PER_CATEGORY = 10; 
         const TOTAL_ADJECTIVES_REQUIRED = 10; 
-
-        function generateUUID() { 
-            return crypto.randomUUID();
-        }
         
         function countFilledInputs() {
             if (!strengthsInputsContainer || !weaknessesInputsContainer) return 0;
@@ -355,40 +346,7 @@
         }
 
         function main() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const formForIdFromUrl = urlParams.get('formFor'); 
-
-            if (formForIdFromUrl) { 
-                targetUserId = formForIdFromUrl;
-                if(targetUserIdField) targetUserIdField.value = targetUserId; 
-                console.log(`Formulaire pour donner du feedback à l'utilisateur : ${targetUserId}`);
-                if(shareLinkSection) shareLinkSection.style.display = 'none';
-                if(invalidLinkSection) invalidLinkSection.style.display = 'none';
-                if(feedbackForm) feedbackForm.style.display = 'block';
-            } else { 
-                generatedUserShareId = generateUUID(); 
-                targetUserId = generatedUserShareId; 
-                if(targetUserIdField) targetUserIdField.value = targetUserId; 
-                
-                console.log(`L'utilisateur veut obtenir son lien partageable. Son ID généré est : ${generatedUserShareId}.`);
-                const shareUrl = `${window.location.origin}${window.location.pathname}?formFor=${generatedUserShareId}`;
-                if(shareableLinkEl) shareableLinkEl.textContent = shareUrl;
-                if(userUniqueIdDisplayEl) userUniqueIdDisplayEl.textContent = generatedUserShareId;
-                if(shareLinkSection) shareLinkSection.style.display = 'block';
-                if(invalidLinkSection) invalidLinkSection.style.display = 'none'; 
-                if(feedbackForm) feedbackForm.style.display = 'block'; 
-                
-                const parentOfFeedbackForm = feedbackForm ? feedbackForm.parentNode : null;
-                if (parentOfFeedbackForm) {
-                    const existingTestMessage = parentOfFeedbackForm.querySelector('.test-message-feedback');
-                    if (!existingTestMessage) {
-                        const testMessage = document.createElement('p');
-                        testMessage.className = 'text-sm text-gray-600 bg-yellow-50 p-3 rounded-md mb-4 border border-yellow-300 test-message-feedback';
-                        testMessage.innerHTML = `Utilisez le formulaire ci-dessous pour tester la soumission de feedback pour vous-même. Les réponses iront à votre propre identifiant généré (<strong>${generatedUserShareId}</strong>). Partagez le lien ci-dessus avec vos collègues.`;
-                        parentOfFeedbackForm.insertBefore(testMessage, feedbackForm);
-                    }
-                }
-            }
+            if(feedbackForm) feedbackForm.style.display = 'block';
             updateAdjectiveInputs(contextSelect ? contextSelect.value : ""); 
             if(loadingOverlay) loadingOverlay.style.display = 'none';
         }
