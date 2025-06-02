@@ -162,8 +162,13 @@
             <input type="hidden" name="form-name" value="feedback" />
             
             <div class="hidden-field-template">
-                <input type="text" name="strength-template" value="">
-                <input type="text" name="improvement-template" value="">
+                {/* Add examples of ALL dynamically generated field name patterns Netlify needs to see */}
+                {/* Example for one context (e.g., 'vulgarisation') and one card index (e.g., '0') */}
+                <input type="text" name="strength-vulgarisation-0" value="">
+                <input type="text" name="improvement-vulgarisation-0" value="">
+                {/* You might want to add one for each context if Netlify is still picky, 
+                    but often one example of the pattern is enough. 
+                    The custom_context_name_autre is already specific. */}
                 <input type="text" name="custom_context_name_autre" value="">
             </div>
             
