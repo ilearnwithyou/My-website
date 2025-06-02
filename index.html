@@ -175,58 +175,59 @@
             <input type="hidden" name="form-name" value="feedback" />
             
             <div class="hidden-field-template">
-                <!-- Examples for ALL context IDs and ALL card indices (0-4) for strength and improvement -->
-                <!-- This is verbose, but ensures Netlify sees all possible field names -->
-                <script>
-                    // This script will be run by the browser, not by Netlify's build bot.
-                    // It's to dynamically generate the hidden fields for Netlify's bot if we were to use a more complex setup.
-                    // However, for static HTML, we need to list them out.
-                    // For brevity in this example, I'll show the full set for 'vulgarisation'
-                    // and then a comment indicating the rest should follow the same pattern.
-                </script>
-                <input type="text" name="strength-vulgarisation-0" value="">
-                <input type="text" name="strength-vulgarisation-1" value="">
-                <input type="text" name="strength-vulgarisation-2" value="">
-                <input type="text" name="strength-vulgarisation-3" value="">
-                <input type="text" name="strength-vulgarisation-4" value="">
-                <input type="text" name="improvement-vulgarisation-0" value="">
-                <input type="text" name="improvement-vulgarisation-1" value="">
-                <input type="text" name="improvement-vulgarisation-2" value="">
-                <input type="text" name="improvement-vulgarisation-3" value="">
-                <input type="text" name="improvement-vulgarisation-4" value="">
+                <script id="netlify-hidden-fields-script">
+                    const hiddenFieldContexts = [
+                        { id: "vulgarisation" }, { id: "interaction" }, { id: "animation" },
+                        { id: "improvisation" }, { id: "structuration" }, { id: "accompagnement" },
+                        { id: "posture" }, { id: "adaptabilite" }, { id: "transmission" },
+                        { id: "ouverture" }, { id: "autre" }
+                    ];
+                    const hiddenFieldTypes = ['strength', 'improvement'];
+                    const hiddenFieldIndices = [0, 1, 2, 3, 4]; // 5 cards per axe
 
-                {/* Repeat the above pattern for EACH context ID: interaction, animation, etc. */}
-                {/* For example, for 'interaction': */}
-                <input type="text" name="strength-interaction-0" value="">
-                <input type="text" name="improvement-interaction-0" value="">
-                {/* ... and so on for all 5 strengths and 5 improvements for 'interaction' */}
-                
-                {/* To keep this example shorter, I'll only list one for the other contexts. 
-                    IN A REAL DEPLOYMENT, YOU'D LIST ALL 5 STRENGTHS AND 5 IMPROVEMENTS FOR EACH. */}
-                <input type="text" name="strength-animation-0" value="">
-                <input type="text" name="improvement-animation-0" value="">
-                <input type="text" name="strength-improvisation-0" value="">
-                <input type="text" name="improvement-improvisation-0" value="">
-                <input type="text" name="strength-structuration-0" value="">
-                <input type="text" name="improvement-structuration-0" value="">
-                <input type="text" name="strength-accompagnement-0" value="">
-                <input type="text" name="improvement-accompagnement-0" value="">
-                <input type="text" name="strength-posture-0" value="">
-                <input type="text" name="improvement-posture-0" value="">
-                <input type="text" name="strength-adaptabilite-0" value="">
-                <input type="text" name="improvement-adaptabilite-0" value="">
-                <input type="text" name="strength-transmission-0" value="">
-                <input type="text" name="improvement-transmission-0" value="">
-                <input type="text" name="strength-ouverture-0" value="">
-                <input type="text" name="improvement-ouverture-0" value="">
-                <input type="text" name="strength-autre-0" value="">
-                <input type="text" name="improvement-autre-0" value="">
+                    let fieldsHTML = '';
+                    hiddenFieldContexts.forEach(context => {
+                        hiddenFieldTypes.forEach(type => {
+                            hiddenFieldIndices.forEach(index => {
+                                fieldsHTML += `<input type="text" name="${type}-${context.id}-${index}" value="">\n`;
+                            });
+                        });
+                    });
+                    fieldsHTML += `<input type="text" name="custom_context_name_autre" value="">\n`;
+                    // This script block itself will be removed by the browser, 
+                    // but its content (the input fields) will be parsed by Netlify if this script runs during build.
+                    // For pure static HTML, we'd paste the output of this script here.
+                    // Since this is a live HTML page, we can let JS create these for the DOM,
+                    // but Netlify's bot won't run this JS. So, they must be physically in the HTML.
+                    // The below is a static representation for Netlify's bot.
+                </script>
+                <input type="text" name="strength-vulgarisation-0" value=""><input type="text" name="strength-vulgarisation-1" value=""><input type="text" name="strength-vulgarisation-2" value=""><input type="text" name="strength-vulgarisation-3" value=""><input type="text" name="strength-vulgarisation-4" value="">
+                <input type="text" name="improvement-vulgarisation-0" value=""><input type="text" name="improvement-vulgarisation-1" value=""><input type="text" name="improvement-vulgarisation-2" value=""><input type="text" name="improvement-vulgarisation-3" value=""><input type="text" name="improvement-vulgarisation-4" value="">
+                <input type="text" name="strength-interaction-0" value=""><input type="text" name="strength-interaction-1" value=""><input type="text" name="strength-interaction-2" value=""><input type="text" name="strength-interaction-3" value=""><input type="text" name="strength-interaction-4" value="">
+                <input type="text" name="improvement-interaction-0" value=""><input type="text" name="improvement-interaction-1" value=""><input type="text" name="improvement-interaction-2" value=""><input type="text" name="improvement-interaction-3" value=""><input type="text" name="improvement-interaction-4" value="">
+                <input type="text" name="strength-animation-0" value=""><input type="text" name="strength-animation-1" value=""><input type="text" name="strength-animation-2" value=""><input type="text" name="strength-animation-3" value=""><input type="text" name="strength-animation-4" value="">
+                <input type="text" name="improvement-animation-0" value=""><input type="text" name="improvement-animation-1" value=""><input type="text" name="improvement-animation-2" value=""><input type="text" name="improvement-animation-3" value=""><input type="text" name="improvement-animation-4" value="">
+                <input type="text" name="strength-improvisation-0" value=""><input type="text" name="strength-improvisation-1" value=""><input type="text" name="strength-improvisation-2" value=""><input type="text" name="strength-improvisation-3" value=""><input type="text" name="strength-improvisation-4" value="">
+                <input type="text" name="improvement-improvisation-0" value=""><input type="text" name="improvement-improvisation-1" value=""><input type="text" name="improvement-improvisation-2" value=""><input type="text" name="improvement-improvisation-3" value=""><input type="text" name="improvement-improvisation-4" value="">
+                <input type="text" name="strength-structuration-0" value=""><input type="text" name="strength-structuration-1" value=""><input type="text" name="strength-structuration-2" value=""><input type="text" name="strength-structuration-3" value=""><input type="text" name="strength-structuration-4" value="">
+                <input type="text" name="improvement-structuration-0" value=""><input type="text" name="improvement-structuration-1" value=""><input type="text" name="improvement-structuration-2" value=""><input type="text" name="improvement-structuration-3" value=""><input type="text" name="improvement-structuration-4" value="">
+                <input type="text" name="strength-accompagnement-0" value=""><input type="text" name="strength-accompagnement-1" value=""><input type="text" name="strength-accompagnement-2" value=""><input type="text" name="strength-accompagnement-3" value=""><input type="text" name="strength-accompagnement-4" value="">
+                <input type="text" name="improvement-accompagnement-0" value=""><input type="text" name="improvement-accompagnement-1" value=""><input type="text" name="improvement-accompagnement-2" value=""><input type="text" name="improvement-accompagnement-3" value=""><input type="text" name="improvement-accompagnement-4" value="">
+                <input type="text" name="strength-posture-0" value=""><input type="text" name="strength-posture-1" value=""><input type="text" name="strength-posture-2" value=""><input type="text" name="strength-posture-3" value=""><input type="text" name="strength-posture-4" value="">
+                <input type="text" name="improvement-posture-0" value=""><input type="text" name="improvement-posture-1" value=""><input type="text" name="improvement-posture-2" value=""><input type="text" name="improvement-posture-3" value=""><input type="text" name="improvement-posture-4" value="">
+                <input type="text" name="strength-adaptabilite-0" value=""><input type="text" name="strength-adaptabilite-1" value=""><input type="text" name="strength-adaptabilite-2" value=""><input type="text" name="strength-adaptabilite-3" value=""><input type="text" name="strength-adaptabilite-4" value="">
+                <input type="text" name="improvement-adaptabilite-0" value=""><input type="text" name="improvement-adaptabilite-1" value=""><input type="text" name="improvement-adaptabilite-2" value=""><input type="text" name="improvement-adaptabilite-3" value=""><input type="text" name="improvement-adaptabilite-4" value="">
+                <input type="text" name="strength-transmission-0" value=""><input type="text" name="strength-transmission-1" value=""><input type="text" name="strength-transmission-2" value=""><input type="text" name="strength-transmission-3" value=""><input type="text" name="strength-transmission-4" value="">
+                <input type="text" name="improvement-transmission-0" value=""><input type="text" name="improvement-transmission-1" value=""><input type="text" name="improvement-transmission-2" value=""><input type="text" name="improvement-transmission-3" value=""><input type="text" name="improvement-transmission-4" value="">
+                <input type="text" name="strength-ouverture-0" value=""><input type="text" name="strength-ouverture-1" value=""><input type="text" name="strength-ouverture-2" value=""><input type="text" name="strength-ouverture-3" value=""><input type="text" name="strength-ouverture-4" value="">
+                <input type="text" name="improvement-ouverture-0" value=""><input type="text" name="improvement-ouverture-1" value=""><input type="text" name="improvement-ouverture-2" value=""><input type="text" name="improvement-ouverture-3" value=""><input type="text" name="improvement-ouverture-4" value="">
+                <input type="text" name="strength-autre-0" value=""><input type="text" name="strength-autre-1" value=""><input type="text" name="strength-autre-2" value=""><input type="text" name="strength-autre-3" value=""><input type="text" name="strength-autre-4" value="">
+                <input type="text" name="improvement-autre-0" value=""><input type="text" name="improvement-autre-1" value=""><input type="text" name="improvement-autre-2" value=""><input type="text" name="improvement-autre-3" value=""><input type="text" name="improvement-autre-4" value="">
                 <input type="text" name="custom_context_name_autre" value="">
             </div>
             
             <div id="allContextsContainer" class="space-y-4">
-                <!-- Accordions will be injected here by JavaScript -->
-            </div>
+                </div>
 
             <div class="mt-10 text-center">
                 <button type="submit" id="submitButton" 
@@ -439,11 +440,9 @@
                 // Accordion exclusivity logic and scroll into view
                 details.addEventListener('toggle', (event) => {
                     if (details.open) {
-                        // Scroll the opened details element to the top of the viewport
-                        // A slight delay can help ensure the layout is stable after opening for smooth scroll
                         setTimeout(() => {
                             details.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }, 100); // 100ms delay, adjust if needed
+                        }, 100); 
 
                         allDetailsElements.forEach(otherDetails => {
                             if (otherDetails !== details && otherDetails.open) {
@@ -490,8 +489,24 @@
                     submitButton.innerHTML = '<div class="spinner !w-6 !h-6 !border-2 inline-block mr-2"></div>Envoi en cours...';
                 }
 
-                const formData = new FormData(feedbackForm);
-                const body = new URLSearchParams(formData).toString();
+                // Manually construct FormData to only include filled fields
+                const processedFormData = new FormData();
+                processedFormData.append('form-name', feedbackForm.getAttribute('name') || 'feedback');
+
+                feedbackForm.querySelectorAll('textarea').forEach(textarea => {
+                    const value = textarea.value.trim();
+                    if (value) { // Only add non-empty values
+                        processedFormData.append(textarea.name, value);
+                    }
+                });
+                // Also add the custom context name if filled
+                const customContextNameInput = document.getElementById('custom_context_name_autre');
+                if(customContextNameInput && customContextNameInput.value.trim()){
+                    processedFormData.append(customContextNameInput.name, customContextNameInput.value.trim());
+                }
+
+
+                const body = new URLSearchParams(processedFormData).toString();
 
                 try {
                     const response = await fetch("/", { 
