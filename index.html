@@ -314,10 +314,12 @@
         function renderAllContexts() {
             if (!allContextsContainer) return;
             allContextsContainer.innerHTML = ''; 
+            const allDetailsElements = []; // Keep a list of all <details> elements
 
             contexts.forEach(context => {
                 const details = document.createElement('details');
                 details.className = 'accordion-item bg-white rounded-lg shadow-md'; 
+                allDetailsElements.push(details); // Add to the list
 
                 const summary = document.createElement('summary');
                 summary.className = 'accordion-title text-lg font-semibold p-5 flex justify-between items-center cursor-pointer hover:bg-gray-100 rounded-t-lg';
@@ -330,12 +332,10 @@
                 content.className = 'accordion-content'; 
                 content.id = `context-block-${context.id}`;
 
-                // Add context description at the top of the content
                 const descriptionP = document.createElement('p');
                 descriptionP.className = 'context-description';
                 descriptionP.textContent = context.description;
                 content.appendChild(descriptionP);
-
 
                 if (context.id === 'autre') {
                     const customContextInputDiv = document.createElement('div');
@@ -347,15 +347,12 @@
                     content.appendChild(customContextInputDiv);
                 }
 
-                // Counter for this context
                 const entryCounterDiv = document.createElement('div');
                 entryCounterDiv.id = `entryCounter-${context.id}`;
                 entryCounterDiv.className = 'context-entry-counter text-center bg-indigo-50 border border-indigo-200'; 
                 entryCounterDiv.innerHTML = `Saisies pour ce contexte : <span id="filledCountDisplay-${context.id}" class="count-display">0</span> / ${MAX_ENTRIES_PER_CONTEXT} (max)`;
                 content.appendChild(entryCounterDiv);
 
-
-                // Strengths Section
                 const strengthsSection = document.createElement('div');
                 strengthsSection.className = 'mt-4';
                 strengthsSection.innerHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-3 text-center">Atouts</h3>`;
@@ -371,7 +368,6 @@
                 strengthsSection.appendChild(strengthsRow2);
                 content.appendChild(strengthsSection);
 
-                // Improvements Section
                 const improvementsSection = document.createElement('div');
                 improvementsSection.className = 'mt-8'; 
                 improvementsSection.innerHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-3 text-center">Améliorations</h3>`;
@@ -392,6 +388,17 @@
                 allContextsContainer.appendChild(details);
                 
                 updateContextEntryCounter(context.id);
+
+                // Accordion exclusivity logic
+                details.addEventListener('toggle', (event) => {
+                    if (details.open) {
+                        allDetailsElements.forEach(otherDetails => {
+                            if (otherDetails !== details && otherDetails.open) {
+                                otherDetails.open = false;
+                            }
+                        });
+                    }
+                });
             });
             if(submitButton) submitButton.disabled = false; 
         }
