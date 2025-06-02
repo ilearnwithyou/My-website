@@ -3,73 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulaire de Feedback Anonyme (Netlify)</title>
+    <title>Formulaire de Feedback Anonyme et Bienveillant</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* Custom font */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Tailwind gray-100 */
+            background-color: #FAFAFA;
+            color: #212121;
+        }
+        h1, h2, h3, summary { /* Apply Poppins to summary as well for accordion titles */
+            font-family: 'Poppins', sans-serif;
+        }
+        .card {
+            aspect-ratio: 1 / 1;
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            padding: 1rem;
+            transition: all 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+        .card textarea {
+            flex-grow: 1;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            resize: none;
+            width: 100%;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            color: #212121; 
+        }
+        .card:focus-within, .card textarea:focus { /* Apply focus to card when textarea is focused */
+            transform: scale(1.03);
+            box-shadow: 0 0 0 3px var(--focus-ring-color, #C8E6C9), 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); /* shadow-lg */
+        }
+        .strength-card {
+            background-color: #E8F5E9;
+            --focus-ring-color: #A5D6A7; 
+        }
+        .improvement-card {
+            background-color: #FDECEA;
+            --focus-ring-color: #EF9A9A; 
+        }
+        .char-counter {
+            font-size: 0.75rem; /* text-xs */
+            text-align: right;
+            color: #757575; /* gray-500 */
+            margin-top: 0.25rem; /* mt-1 */
+        }
+
+        details > summary {
+            list-style: none; 
+            cursor: pointer;
+            padding: 1rem 1.5rem;
+            background-color: #FFFFFF; 
+            border: 1px solid #E0E0E0; 
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-out, border-radius 0.3s ease-in-out;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        details > summary:hover {
+            background-color: #f5f5f5; 
+        }
+        details > summary::-webkit-details-marker {
+            display: none; 
+        }
+        details .accordion-content {
+            padding: 0; /* Padding will be applied to inner content for better transition */
+            border: 1px solid #E0E0E0;
+            border-top: none;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            background-color: #FFFFFF;
+            overflow: hidden; 
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), 
+                        opacity 0.3s ease-in-out 0.1s,
+                        padding-top 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), 
+                        padding-bottom 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        details[open] > summary {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            background-color: #E8EAF6; 
+        }
+        details[open] .accordion-content {
+            max-height: 3000px; /* Increased to accommodate content */
+            opacity: 1;
+            padding-top: 1.5rem; /* Apply padding when open */
+            padding-bottom: 1.5rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        details[open] .accordion-icon {
+            transform: rotate(90deg);
         }
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.4); 
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); 
+            align-items: center; justify-content: center; /* For centering modal content */
         }
         .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto; 
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%; 
-            max-width: 500px;
-            border-radius: 0.5rem;
-            text-align: center;
+            background-color: #fefefe; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 500px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
         .modal-close-button {
-            background-color: #4f46e5; 
-            color: white;
-            padding: 10px 20px;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            margin-top: 15px;
+            background-color: #D32F2F; color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; cursor: pointer; margin-top: 1.5rem; transition: background-color 0.2s;
+        }
+        .modal-close-button:hover {
+            background-color: #B71C1C;
         }
         .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #4f46e5; 
-            animation: spin 1s ease infinite;
-            margin: 20px auto;
+            border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #D32F2F; animation: spin 1s ease infinite; margin: 20px auto;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .count-display {
-            font-weight: 500;
+        .hidden-field-template { display: none !important; }
+        .context-entry-counter {
+            font-size: 0.875rem; /* text-sm */
+            padding: 0.5rem 0.75rem; /* p-2 py-1 */
+            border-radius: 0.375rem; /* rounded-md */
+            margin-bottom: 1rem; /* mb-4 */
+            transition: background-color 0.3s, border-color 0.3s;
         }
-        .count-error {
-            color: #ef4444; /* Tailwind red-500 */
-        }
-        .count-valid {
-            color: #10b981; /* Tailwind green-500 */
-        }
-        /* Style pour cacher les champs templates */
-        .hidden-field-template {
-            display: none !important;
-        }
-        /* La classe .truly-hidden-text n'est plus nécessaire pour le commentaire spécifique, mais peut être gardée pour d'autres usages si besoin */
-        .truly-hidden-text {
-            display: none !important;
+        .context-description {
+            font-size: 0.875rem; /* text-sm */
+            color: #424242; /* gray-700 */
+            margin-bottom: 1rem; /* mb-4 */
+            padding: 0.75rem; /* p-3 */
+            background-color: #F5F5F5; /* gray-100 */
+            border-radius: 0.375rem; /* rounded-md */
+            border-left: 4px solid #C8E6C9; /* Accent color */
         }
     </style>
 </head>
@@ -79,69 +151,36 @@
         <p class="ml-3 text-gray-700">Chargement...</p>
     </div>
 
-    <div class="container mx-auto max-w-3xl p-4 sm:p-6 lg:p-8 bg-white shadow-xl rounded-lg mt-10">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-indigo-700">Feedback Anonyme et Bienveillant</h1>
-            <p class="text-gray-600 mt-2">Vos retours sont précieux. Merci de faire preuve de franchise et de bienveillance.</p>
-            <p class="text-gray-600 mt-2">Lâchez-vous, mais pas trop ! &#128521;</p>
+    <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+        <header id="mainHeader" class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-gray-800">Feedback Anonyme et Bienveillant</h1>
+            <p class="text-lg text-gray-600 mt-3">Vos retours sont précieux. Merci de faire preuve de franchise et de bienveillance.</p>
+            <p class="text-lg text-gray-600 mt-2">Lâchez-vous, mais pas trop ! 😉</p>
         </header>
 
-        <div id="shareLinkInfo" class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-md">
-            <h2 class="font-semibold">Lien d'accès au formulaire :</h2>
-            <p id="formAccessLink" class="mt-1 break-all bg-blue-100 p-2 rounded">https://formyform.netlify.app/</p>
-            <p class="mt-2 text-sm">Partagez ce lien avec vos collègues pour qu'ils puissent soumettre leur feedback.</p>
-        </div>
-        
-        <!-- La section invalidLinkSection n'est plus nécessaire car il n'y a plus de paramètre d'URL à valider pour le destinataire -->
-
-        <form id="feedbackForm" name="feedback" netlify>
+        <form id="feedbackForm" name="feedback" netlify class="space-y-6">
             <input type="hidden" name="form-name" value="feedback" />
-            <!-- Le champ targetUserIdField n'est plus nécessaire -->
-
-            <!-- Commentaire HTML pour les développeurs, ne s'affichera pas -->
-            <!-- Champs cachés pour que Netlify reconnaisse les noms 'strength' et 'weakness' -->
             
-            <!-- Commentaire HTML pour les développeurs, ne s'affichera pas -->
-            <!-- Champs cachés pour que Netlify reconnaisse les noms 'strength' et 'weakness' lors du build -->
             <div class="hidden-field-template">
-                <input type="text" name="strength" value="">
-                <input type="text" name="weakness" value="">
-            </div>
-
-            <div class="mb-6">
-                <label for="context" class="block text-sm font-medium text-gray-800 mb-1">Pour quel contexte souhaitez-vous donner du feedback ?</label>
-                <select id="context" name="context" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                    <option value="">-- Choisissez un contexte --</option>
-                    <option value="travail">Travail / Entreprise</option>
-                    <option value="formation">Formation</option>
-                    <option value="cours">Cours</option>
-                    <option value="vie_personnelle">Vie Personnelle</option>
-                </select>
+                <input type="text" name="strength-template" value="">
+                <input type="text" name="improvement-template" value="">
+                <input type="text" name="custom_context_name_autre" value="">
             </div>
             
-            <p id="overallInstruction" class="text-sm text-gray-700 bg-indigo-50 p-3 rounded-md mb-2 border border-indigo-200" style="display: none;">
-                Veuillez fournir un total de <strong>10 descriptions</strong> (atouts et/ou faiblesses combinés) parmi les champs ci-dessous.
-            </p>
-            <div id="entryCounter" class="text-sm text-gray-600 mb-6 p-3 rounded-md" style="display: none;">
-                Descriptions saisies : <span id="filledCountDisplay" class="count-display">0</span> / 10
+            <div id="allContextsContainer" class="space-y-4">
+                <!-- Accordions will be injected here by JavaScript -->
             </div>
 
-            <div id="adjectivesContainer" class="space-y-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Atouts <span id="strengthsCountDisplay" class="text-sm font-normal text-gray-500">(0 disponibles)</span></h3>
-                    <p class="text-sm text-gray-500 mb-3">Décrivez en quelques mots clés les principales forces.</p>
-                    <div id="strengthsInputsContainer" class="space-y-3"></div>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Axes d'amélioration / Faiblesses <span id="weaknessesCountDisplay" class="text-sm font-normal text-gray-500">(0 disponibles)</span></h3>
-                     <p class="text-sm text-gray-500 mb-3">Quels sont les points sur lesquels une amélioration serait bénéfique ? Soyez constructif.</p>
-                    <div id="weaknessesInputsContainer" class="space-y-3"></div>
-                </div>
-            </div>
-
-            <div class="mt-8 text-center">
-                <button type="submit" id="submitButton" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50" disabled>
-                    Soumettre le Feedback
+            <div class="mt-10 text-center">
+                <button type="submit" id="submitButton" 
+                        class="inline-flex items-center justify-center rounded-md border border-transparent px-8 py-3 
+                               text-base font-medium text-white shadow-sm 
+                               focus:outline-none focus:ring-2 focus:ring-offset-2 
+                               transition-colors duration-150"
+                        style="background-color: #D32F2F;"
+                        onmouseover="this.style.backgroundColor='#B71C1C'"
+                        onmouseout="this.style.backgroundColor='#D32F2F'">
+                    Envoyer le feedback
                 </button>
             </div>
         </form>
@@ -149,7 +188,7 @@
 
     <div id="messageModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalTitle" class="text-xl font-semibold mb-3"></h3>
+            <h3 id="modalTitle" class="text-2xl font-semibold mb-4 text-gray-800"></h3>
             <p id="modalMessage" class="text-gray-700"></p>
             <button id="modalCloseButton" class="modal-close-button">Fermer</button>
         </div>
@@ -161,154 +200,224 @@
         const modalMessage = document.getElementById('modalMessage');
         const modalCloseButton = document.getElementById('modalCloseButton');
         
-        function showModal(title, message) {
-            if (modalTitle && modalMessage && messageModal) { 
+        function showModal(title, message, onCloseButtonClickCallback) {
+            if (modalTitle && modalMessage && messageModal && modalCloseButton) { 
                 modalTitle.textContent = title;
                 modalMessage.innerHTML = message; 
-                messageModal.style.display = "block";
+                messageModal.style.display = "flex"; 
+
+                modalCloseButton.onclick = typeof onCloseButtonClickCallback === 'function' 
+                    ? onCloseButtonClickCallback 
+                    : () => { if(messageModal) messageModal.style.display = "none"; };
             } else {
                 console.error("Modal elements not found. Cannot display message:", title, message);
                 alert(title + "\n\n" + message.replace(/<br\s*\/?>/gi, "\n"));
             }
         }
         
-        if (modalCloseButton) {
-            modalCloseButton.onclick = () => { if(messageModal) messageModal.style.display = "none"; };
-        }
         window.onclick = (event) => {
             if (event.target == messageModal && messageModal) {
                 messageModal.style.display = "none";
+                 if(modalCloseButton) modalCloseButton.textContent = "Fermer";
             }
         }
         
         const loadingOverlay = document.getElementById('loading-overlay');
         const feedbackForm = document.getElementById('feedbackForm'); 
-        const contextSelect = document.getElementById('context');
-        const overallInstruction = document.getElementById('overallInstruction');
-        const entryCounterDiv = document.getElementById('entryCounter');
-        const filledCountDisplay = document.getElementById('filledCountDisplay');
-        const strengthsInputsContainer = document.getElementById('strengthsInputsContainer');
-        const weaknessesInputsContainer = document.getElementById('weaknessesInputsContainer');
-        const strengthsCountDisplayEl = document.getElementById('strengthsCountDisplay');
-        const weaknessesCountDisplayEl = document.getElementById('weaknessesCountDisplay');
+        const allContextsContainer = document.getElementById('allContextsContainer');
         const submitButton = document.getElementById('submitButton');
+        const mainHeaderDiv = document.getElementById('mainHeader'); 
 
-        const contextLabels = {
-            travail: "Travail / Entreprise",
-            formation: "Formation",
-            cours: "Cours",
-            vie_personnelle: "Vie Personnelle"
-        };
-
-        const NUM_INPUTS_PER_CATEGORY = 10; 
-        const TOTAL_ADJECTIVES_REQUIRED = 10; 
+        const contexts = [
+            { id: "vulgarisation", label: "Vulgarisation", description: "Explication d’un concept complexe à un public non technique" },
+            { id: "interaction", label: "Interaction", description: "Relations avec les participants (écoute, encouragements, questions)" },
+            { id: "animation", label: "Animation", description: "Dynamisme et engagement pendant la session" },
+            { id: "improvisation", label: "Improvisation", description: "Réactions en cas d’imprévus ou de bugs techniques" },
+            { id: "structuration", label: "Structuration", description: "Clarté et logique du déroulé pédagogique" },
+            { id: "accompagnement", label: "Accompagnement", description: "Aide apportée lors des exercices ou ateliers pratiques" },
+            { id: "posture", label: "Posture", description: "Attitude générale (professionnalisme, accessibilité, crédibilité)" },
+            { id: "adaptabilite", label: "Adaptabilité", description: "Ajustements faits selon le niveau ou les besoins du groupe" },
+            { id: "transmission", label: "Transmission", description: "Impact sur la motivation et l’envie de continuer après la session" },
+            { id: "ouverture", label: "Ouverture", description: "Réceptivité aux retours, critiques et suggestions" },
+            { id: "autre", label: "Autre (à préciser)", description: "Si vous avez un retour sur un autre aspect non listé." }
+        ];
         
-        function countFilledInputs() {
-            if (!strengthsInputsContainer || !weaknessesInputsContainer) return 0;
-            const filledStrengthsCount = Array.from(strengthsInputsContainer.querySelectorAll('input[name="strength"]'))
-                                         .filter(input => input.value.trim() !== '').length;
-            const filledWeaknessesCount = Array.from(weaknessesInputsContainer.querySelectorAll('input[name="weakness"]'))
-                                          .filter(input => input.value.trim() !== '').length;
-            return filledStrengthsCount + filledWeaknessesCount;
-        }
+        const MAX_CHARS_PER_CARD = 250;
+        const CARDS_PER_AXE = 5; 
+        const MAX_ENTRIES_PER_CONTEXT = 5; 
 
-        function updateEntryCounter() {
-            if (!contextSelect || contextSelect.value === "") { 
-                if(entryCounterDiv) entryCounterDiv.style.display = 'none';
-                return;
-            }
-            if(entryCounterDiv) entryCounterDiv.style.display = 'block';
-            const totalFilled = countFilledInputs();
-            if(filledCountDisplay) filledCountDisplay.textContent = totalFilled;
+        function createCard(type, contextId, cardIndex) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = `card ${type === 'strength' ? 'strength-card' : 'improvement-card'}`;
+            
+            const textarea = document.createElement('textarea');
+            textarea.name = `${type === 'strength' ? 'strength' : 'improvement'}-${contextId}-${cardIndex}`;
+            textarea.placeholder = type === 'strength' ? `Atout #${cardIndex + 1}` : `Amélioration #${cardIndex + 1}`;
+            textarea.maxLength = MAX_CHARS_PER_CARD;
+            
+            const charCounter = document.createElement('div');
+            charCounter.className = 'char-counter';
+            charCounter.textContent = `0 / ${MAX_CHARS_PER_CARD}`;
 
-            if (totalFilled > TOTAL_ADJECTIVES_REQUIRED) {
-                if(filledCountDisplay) {
-                    filledCountDisplay.classList.add('count-error');
-                    filledCountDisplay.classList.remove('count-valid');
-                }
-                if(entryCounterDiv) {
-                    entryCounterDiv.classList.add('bg-red-50', 'border', 'border-red-200');
-                    entryCounterDiv.classList.remove('bg-green-50', 'border-green-200', 'bg-indigo-50', 'border-indigo-200');
-                }
-            } else if (totalFilled === TOTAL_ADJECTIVES_REQUIRED) {
-                 if(filledCountDisplay) {
-                    filledCountDisplay.classList.add('count-valid');
-                    filledCountDisplay.classList.remove('count-error');
-                }
-                if(entryCounterDiv) {
-                    entryCounterDiv.classList.add('bg-green-50', 'border', 'border-green-200');
-                    entryCounterDiv.classList.remove('bg-red-50', 'border-red-200', 'bg-indigo-50', 'border-indigo-200');
-                }
-            } else {
-                if(filledCountDisplay) {
-                    filledCountDisplay.classList.remove('count-error', 'count-valid');
-                }
-                if(entryCounterDiv) {
-                    entryCounterDiv.classList.add('bg-indigo-50', 'border', 'border-indigo-200');
-                    entryCounterDiv.classList.remove('bg-red-50', 'border-red-200', 'bg-green-50', 'border-green-200');
-                }
-            }
-        }
-
-        function updateAdjectiveInputs(selectedContextValue) {
-            if(strengthsInputsContainer) strengthsInputsContainer.innerHTML = '';
-            if(weaknessesInputsContainer) weaknessesInputsContainer.innerHTML = '';
-            updateEntryCounter(); 
-
-            if (!selectedContextValue) {
-                if(strengthsCountDisplayEl) strengthsCountDisplayEl.textContent = `(0 disponibles)`;
-                if(weaknessesCountDisplayEl) weaknessesCountDisplayEl.textContent = `(0 disponibles)`;
-                if(overallInstruction) overallInstruction.style.display = 'none';
-                if(entryCounterDiv) entryCounterDiv.style.display = 'none';
-                if(submitButton) submitButton.disabled = true;
-                return;
-            }
-
-            if(overallInstruction) overallInstruction.style.display = 'block';
-            if(entryCounterDiv) entryCounterDiv.style.display = 'block';
-            if(strengthsCountDisplayEl) strengthsCountDisplayEl.textContent = `(${NUM_INPUTS_PER_CATEGORY} disponibles)`;
-            if(weaknessesCountDisplayEl) weaknessesCountDisplayEl.textContent = `(${NUM_INPUTS_PER_CATEGORY} disponibles)`;
-
-            for (let i = 0; i < NUM_INPUTS_PER_CATEGORY; i++) {
-                const strengthInput = document.createElement('input');
-                strengthInput.type = 'text';
-                strengthInput.name = 'strength'; 
-                strengthInput.placeholder = `Atout #${i + 1}`;
-                strengthInput.className = 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2';
-                strengthInput.addEventListener('input', updateEntryCounter);
-                if(strengthsInputsContainer) strengthsInputsContainer.appendChild(strengthInput);
-
-                const weaknessInput = document.createElement('input');
-                weaknessInput.type = 'text';
-                weaknessInput.name = 'weakness'; 
-                weaknessInput.placeholder = `Point d'amélioration #${i + 1}`;
-                weaknessInput.className = 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2';
-                weaknessInput.addEventListener('input', updateEntryCounter);
-                if(weaknessesInputsContainer) weaknessesInputsContainer.appendChild(weaknessInput);
-            }
-            if(submitButton) submitButton.disabled = false;
-            updateEntryCounter(); 
-        }
-
-        if(contextSelect) {
-            contextSelect.addEventListener('change', (event) => {
-                updateAdjectiveInputs(event.target.value);
+            textarea.addEventListener('input', () => {
+                charCounter.textContent = `${textarea.value.length} / ${MAX_CHARS_PER_CARD}`;
+                updateContextEntryCounter(contextId); 
             });
+
+            cardDiv.appendChild(textarea);
+            cardDiv.appendChild(charCounter);
+            return cardDiv;
+        }
+
+        function countFilledCardsForContext(contextId) {
+            const contextBlock = document.getElementById(`context-block-${contextId}`);
+            if (!contextBlock) return 0;
+
+            const filledStrengthsCount = Array.from(contextBlock.querySelectorAll('textarea[name^="strength-"]'))
+                                         .filter(textarea => textarea.value.trim() !== '').length;
+            const filledImprovementsCount = Array.from(contextBlock.querySelectorAll('textarea[name^="improvement-"]'))
+                                          .filter(textarea => textarea.value.trim() !== '').length;
+            return filledStrengthsCount + filledImprovementsCount;
+        }
+
+        function updateContextEntryCounter(contextId) {
+            const counterDisplay = document.getElementById(`filledCountDisplay-${contextId}`);
+            const counterContainer = document.getElementById(`entryCounter-${contextId}`);
+            if (!counterDisplay || !counterContainer) return;
+
+            const totalFilled = countFilledCardsForContext(contextId);
+            counterDisplay.textContent = totalFilled;
+
+            if (totalFilled > MAX_ENTRIES_PER_CONTEXT) {
+                counterDisplay.classList.add('count-error');
+                counterDisplay.classList.remove('count-valid');
+                counterContainer.classList.add('bg-red-100', 'border-red-300'); 
+                counterContainer.classList.remove('bg-indigo-50', 'border-indigo-200');
+            } else {
+                counterDisplay.classList.remove('count-error');
+                counterDisplay.classList.add('count-valid');
+                counterContainer.classList.add('bg-indigo-50', 'border-indigo-200');
+                counterContainer.classList.remove('bg-red-100', 'border-red-300');
+            }
+        }
+        
+        function renderAllContexts() {
+            if (!allContextsContainer) return;
+            allContextsContainer.innerHTML = ''; 
+
+            contexts.forEach(context => {
+                const details = document.createElement('details');
+                details.className = 'accordion-item bg-white rounded-lg shadow-md'; 
+
+                const summary = document.createElement('summary');
+                summary.className = 'accordion-title text-lg font-semibold p-5 flex justify-between items-center cursor-pointer hover:bg-gray-100 rounded-t-lg';
+                summary.innerHTML = `
+                    <span>${context.label}</span>
+                    <svg class="accordion-icon w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                `;
+
+                const content = document.createElement('div');
+                content.className = 'accordion-content'; 
+                content.id = `context-block-${context.id}`;
+
+                // Add context description at the top of the content
+                const descriptionP = document.createElement('p');
+                descriptionP.className = 'context-description';
+                descriptionP.textContent = context.description;
+                content.appendChild(descriptionP);
+
+
+                if (context.id === 'autre') {
+                    const customContextInputDiv = document.createElement('div');
+                    customContextInputDiv.className = 'mb-6 pt-2'; 
+                    customContextInputDiv.innerHTML = `
+                        <label for="custom_context_name_${context.id}" class="block text-sm font-medium text-gray-700 mb-1">Précisez le nom de cet "Autre contexte" :</label>
+                        <input type="text" name="custom_context_name_${context.id}" id="custom_context_name_${context.id}" placeholder="Nom du contexte personnalisé" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                    `;
+                    content.appendChild(customContextInputDiv);
+                }
+
+                // Counter for this context
+                const entryCounterDiv = document.createElement('div');
+                entryCounterDiv.id = `entryCounter-${context.id}`;
+                entryCounterDiv.className = 'context-entry-counter text-center bg-indigo-50 border border-indigo-200'; 
+                entryCounterDiv.innerHTML = `Saisies pour ce contexte : <span id="filledCountDisplay-${context.id}" class="count-display">0</span> / ${MAX_ENTRIES_PER_CONTEXT} (max)`;
+                content.appendChild(entryCounterDiv);
+
+
+                // Strengths Section
+                const strengthsSection = document.createElement('div');
+                strengthsSection.className = 'mt-4';
+                strengthsSection.innerHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-3 text-center">Atouts</h3>`;
+                
+                const strengthsRow1 = document.createElement('div');
+                strengthsRow1.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4';
+                for(let i=0; i < 3; i++) strengthsRow1.appendChild(createCard('strength', context.id, i));
+                strengthsSection.appendChild(strengthsRow1);
+
+                const strengthsRow2 = document.createElement('div');
+                strengthsRow2.className = 'flex justify-center gap-4 flex-wrap'; 
+                for(let i=3; i < CARDS_PER_AXE; i++) strengthsRow2.appendChild(createCard('strength', context.id, i));
+                strengthsSection.appendChild(strengthsRow2);
+                content.appendChild(strengthsSection);
+
+                // Improvements Section
+                const improvementsSection = document.createElement('div');
+                improvementsSection.className = 'mt-8'; 
+                improvementsSection.innerHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-3 text-center">Améliorations</h3>`;
+
+                const improvementsRow1 = document.createElement('div');
+                improvementsRow1.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4';
+                for(let i=0; i < 3; i++) improvementsRow1.appendChild(createCard('improvement', context.id, i));
+                improvementsSection.appendChild(improvementsRow1);
+
+                const improvementsRow2 = document.createElement('div');
+                improvementsRow2.className = 'flex justify-center gap-4 flex-wrap';
+                for(let i=3; i < CARDS_PER_AXE; i++) improvementsRow2.appendChild(createCard('improvement', context.id, i));
+                improvementsSection.appendChild(improvementsRow2);
+                content.appendChild(improvementsSection);
+
+                details.appendChild(summary);
+                details.appendChild(content);
+                allContextsContainer.appendChild(details);
+                
+                updateContextEntryCounter(context.id);
+            });
+            if(submitButton) submitButton.disabled = false; 
         }
         
         if(feedbackForm) {
             feedbackForm.addEventListener('submit', async (event) => {
                 event.preventDefault(); 
+                
+                let formIsValid = true;
+                let firstInvalidContextLabel = "";
+                for (const context of contexts) {
+                    const filledCount = countFilledCardsForContext(context.id);
+                    if (filledCount > MAX_ENTRIES_PER_CONTEXT) {
+                        formIsValid = false;
+                        firstInvalidContextLabel = context.label;
+                        const problemAccordion = document.getElementById(`entryCounter-${context.id}`);
+                        if(problemAccordion) {
+                            problemAccordion.scrollIntoView({behavior: "smooth", block: "center"});
+                            const detailsElement = problemAccordion.closest('details');
+                            if (detailsElement && !detailsElement.open) {
+                                detailsElement.open = true;
+                            }
+                        }
+                        break; 
+                    }
+                }
 
-                const totalFilledCount = countFilledInputs();
-                if (totalFilledCount !== TOTAL_ADJECTIVES_REQUIRED) {
-                     showModal("Validation Échouée", `Veuillez fournir un total exact de ${TOTAL_ADJECTIVES_REQUIRED} descriptions (atouts et/ou faiblesses). Vous en avez actuellement fourni ${totalFilledCount}.`);
-                    return; 
+                if (!formIsValid) {
+                    showModal("Validation Échouée", `Pour le contexte "${firstInvalidContextLabel}", vous avez saisi plus de ${MAX_ENTRIES_PER_CONTEXT} descriptions. Veuillez corriger.`);
+                    if(modalCloseButton) modalCloseButton.textContent = "Fermer";
+                    return;
                 }
                 
                 if(submitButton) {
                     submitButton.disabled = true;
-                    submitButton.innerHTML = '<div class="spinner !w-5 !h-5 !border-2 !m-0 inline-block mr-2"></div>Envoi en cours...';
+                    submitButton.innerHTML = '<div class="spinner !w-6 !h-6 !border-2 inline-block mr-2"></div>Envoi en cours...';
                 }
 
                 const formData = new FormData(feedbackForm);
@@ -323,32 +432,44 @@
 
                     if (response.ok) {
                         console.log("Feedback soumis avec succès à Netlify.");
-                        showModal("Merci !", "Votre feedback a été soumis avec succès !");
-                        if(feedbackForm) feedbackForm.reset(); 
-                        updateAdjectiveInputs(""); 
-                        if(contextSelect) contextSelect.value = ""; 
-                        if(overallInstruction) overallInstruction.style.display = 'none';
-                        if(entryCounterDiv) entryCounterDiv.style.display = 'none'; 
+                        
+                        const successModalCloseAction = () => {
+                            const newWindow = window.open('about:blank', '_self');
+                            if (newWindow) { newWindow.close(); }
+                            if (messageModal) messageModal.style.display = "none"; 
+                        };
+                        
+                        if(modalCloseButton) modalCloseButton.textContent = "Fermer la page";
+                        showModal("Merci infiniment !", "Votre feedback a été soumis avec succès. Vos retours sont précieux pour nous aider à nous améliorer. Vous pouvez maintenant fermer cette page.", successModalCloseAction);
+                        
+                        if(feedbackForm) feedbackForm.style.display = 'none';
+                        if(mainHeaderDiv) mainHeaderDiv.style.display = 'none'; 
+
                     } else {
                         const errorText = await response.text();
                         console.error("Erreur de soumission à Netlify:", response.status, errorText);
-                        showModal("Erreur de Soumission", `Une erreur est survenue lors de la soumission du formulaire à Netlify (status: ${response.status}). Veuillez réessayer.`);
+                        showModal("Erreur de Soumission", `Une erreur est survenue (status: ${response.status}). Veuillez réessayer ou nous contacter si le problème persiste.`);
+                        if(modalCloseButton) modalCloseButton.textContent = "Fermer"; 
                     }
                 } catch (error) {
                     console.error("Erreur de réseau ou autre lors de la soumission à Netlify:", error);
                     showModal("Erreur de Soumission", "Une erreur de réseau est survenue. Veuillez vérifier votre connexion et réessayer.");
+                    if(modalCloseButton) modalCloseButton.textContent = "Fermer"; 
                 } finally {
                      if(submitButton) {
                         submitButton.disabled = false;
-                        submitButton.textContent = 'Soumettre le Feedback';
+                        submitButton.textContent = 'Envoyer le feedback';
                     }
                 }
             });
         }
 
         function main() {
-            if(feedbackForm) feedbackForm.style.display = 'block';
-            updateAdjectiveInputs(contextSelect ? contextSelect.value : ""); 
+            if(feedbackForm) feedbackForm.style.display = 'block'; 
+            if(mainHeaderDiv) mainHeaderDiv.style.display = 'block'; 
+            
+            renderAllContexts(); 
+            
             if(loadingOverlay) loadingOverlay.style.display = 'none';
         }
         
