@@ -7,6 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        html {
+            scroll-behavior: smooth; /* Enables smooth scrolling for the whole page */
+        }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #FAFAFA;
@@ -314,12 +317,12 @@
         function renderAllContexts() {
             if (!allContextsContainer) return;
             allContextsContainer.innerHTML = ''; 
-            const allDetailsElements = []; // Keep a list of all <details> elements
+            const allDetailsElements = []; 
 
             contexts.forEach(context => {
                 const details = document.createElement('details');
                 details.className = 'accordion-item bg-white rounded-lg shadow-md'; 
-                allDetailsElements.push(details); // Add to the list
+                allDetailsElements.push(details); 
 
                 const summary = document.createElement('summary');
                 summary.className = 'accordion-title text-lg font-semibold p-5 flex justify-between items-center cursor-pointer hover:bg-gray-100 rounded-t-lg';
@@ -389,9 +392,15 @@
                 
                 updateContextEntryCounter(context.id);
 
-                // Accordion exclusivity logic
+                // Accordion exclusivity logic and scroll into view
                 details.addEventListener('toggle', (event) => {
                     if (details.open) {
+                        // Scroll the opened details element to the top of the viewport
+                        // A slight delay can help ensure the layout is stable after opening for smooth scroll
+                        setTimeout(() => {
+                            details.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }, 100); // 100ms delay, adjust if needed
+
                         allDetailsElements.forEach(otherDetails => {
                             if (otherDetails !== details && otherDetails.open) {
                                 otherDetails.open = false;
