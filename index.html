@@ -1,25 +1,468 @@
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>nevoia-ia-innovation</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Feedback Anonyme (Supabase)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Custom font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Tailwind gray-100 */
+        }
+        /* ... (autres styles restent inchangés) ... */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            max-width: 500px;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .modal-close-button {
+            background-color: #4f46e5; 
+            color: white;
+            padding: 10px 20px;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #4f46e5; 
+            animation: spin 1s ease infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .count-display {
+            font-weight: 500;
+        }
+        .count-error {
+            color: #ef4444; /* Tailwind red-500 */
+        }
+        .count-valid {
+            color: #10b981; /* Tailwind green-500 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="loading-overlay" class="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
+        <div class="spinner"></div>
+        <p class="ml-3 text-gray-700">Chargement...</p>
+    </div>
 
-    <meta property="og:title" content="Lovable Generated Project" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <div class="container mx-auto max-w-3xl p-4 sm:p-6 lg:p-8 bg-white shadow-xl rounded-lg mt-10">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-indigo-700">Feedback Anonyme et Bienveillant</h1>
+            <p class="text-gray-600 mt-2">Vos retours sont précieux. Merci de faire preuve de franchise et de bienveillance.</p>
+        </header>
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+        <div id="shareLinkSection" class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-md" style="display: none;">
+            <h2 class="font-semibold">Partagez ce lien pour recevoir du feedback :</h2>
+            <p id="shareableLink" class="mt-1 break-all bg-blue-100 p-2 rounded"></p>
+            <p class="mt-2 text-sm">Votre identifiant unique (pour référence) : <strong id="userUniqueIdDisplay"></strong></p>
+        </div>
+        
+        <div id="invalidLinkSection" class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md" style="display: none;">
+            <h2 class="font-semibold">Lien Invalide ou Problème de Configuration</h2>
+            <p id="invalidLinkMessage">Ce formulaire ne peut pas être utilisé sans un identifiant de destinataire valide dans l'URL (paramètre `formFor`). Si vous êtes le propriétaire et que vous essayez de générer un lien, assurez-vous que la configuration Supabase est correcte.</p>
+        </div>
 
-  <body>
-    <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        <form id="feedbackForm">
+            <div class="mb-6">
+                <label for="context" class="block text-sm font-medium text-gray-800 mb-1">Pour quel contexte souhaitez-vous donner du feedback ?</label>
+                <select id="context" name="context" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                    <option value="">-- Choisissez un contexte --</option>
+                    <option value="travail">Travail / Entreprise</option>
+                    <option value="formation">Formation</option>
+                    <option value="cours">Cours</option>
+                    <option value="vie_personnelle">Vie Personnelle</option>
+                </select>
+            </div>
+            
+            <p id="overallInstruction" class="text-sm text-gray-700 bg-indigo-50 p-3 rounded-md mb-2 border border-indigo-200" style="display: none;">
+                Veuillez fournir un total de <strong>10 descriptions</strong> (atouts et/ou faiblesses combinés) parmi les champs ci-dessous.
+            </p>
+            <div id="entryCounter" class="text-sm text-gray-600 mb-6 p-3 rounded-md" style="display: none;">
+                Descriptions saisies : <span id="filledCountDisplay" class="count-display">0</span> / 10
+            </div>
+
+            <div id="adjectivesContainer" class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Atouts <span id="strengthsCountDisplay" class="text-sm font-normal text-gray-500">(0 disponibles)</span></h3>
+                    <p class="text-sm text-gray-500 mb-3">Décrivez en quelques mots clés les principales forces.</p>
+                    <div id="strengthsInputsContainer" class="space-y-3"></div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Axes d'amélioration / Faiblesses <span id="weaknessesCountDisplay" class="text-sm font-normal text-gray-500">(0 disponibles)</span></h3>
+                     <p class="text-sm text-gray-500 mb-3">Quels sont les points sur lesquels une amélioration serait bénéfique ? Soyez constructif.</p>
+                    <div id="weaknessesInputsContainer" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button type="submit" id="submitButton" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50" disabled>
+                    Soumettre le Feedback
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" class="text-xl font-semibold mb-3"></h3>
+            <p id="modalMessage" class="text-gray-700"></p>
+            <button id="modalCloseButton" class="modal-close-button">Fermer</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Supabase Client Initialization
+        const SUPABASE_URL = 'https://kuftggxorkgimpyeiyit.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1ZnRnZ3hvcmtnaW1weWVpeWl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg4NjU2MjQsImV4cCI6MjA2NDQ0MTYyNH0.zQSaaO6Fp-H3E3CrQHDnH4VyteXiJRs7MvQ34rs-prE'; 
+
+        // Declare modal DOM elements constants *before* showModal function
+        const messageModal = document.getElementById('messageModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+        
+        // Function to display modal messages
+        function showModal(title, message) {
+            if (modalTitle && modalMessage && messageModal) { // Check if elements exist
+                modalTitle.textContent = title;
+                modalMessage.innerHTML = message; 
+                messageModal.style.display = "block";
+            } else {
+                console.error("Modal elements not found. Cannot display message:", title, message);
+                // Fallback to alert if modal elements are somehow not available
+                alert(title + "\n\n" + message.replace(/<br\s*\/?>/gi, "\n"));
+            }
+        }
+        
+        if (modalCloseButton) {
+            modalCloseButton.onclick = () => { if(messageModal) messageModal.style.display = "none"; };
+        }
+        window.onclick = (event) => {
+            if (event.target == messageModal && messageModal) {
+                messageModal.style.display = "none";
+            }
+        }
+
+        let supabaseClient; // Use a different name for the client instance
+        try {
+            if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'VOTRE_CLE_ANON_SUPABASE') { // Keep this check in case the key is accidentally reverted
+                throw new Error("La clé ANON Supabase n'est pas configurée. Veuillez la remplacer dans le script.");
+            }
+            // The global 'supabase' object from the CDN script has the 'createClient' method
+            if (typeof supabase === 'undefined' || typeof supabase.createClient !== 'function') {
+                 throw new Error("La librairie Supabase (supabase.js) n'est pas chargée correctement ou l'objet global 'supabase' est manquant.");
+            }
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log("Supabase client initialized.");
+        } catch (error) {
+            console.error("Erreur d'initialisation de Supabase:", error);
+            showModal("Erreur de Configuration Supabase", "Impossible d'initialiser le client Supabase. Vérifiez l'URL et la clé Anon. <br>Détails: " + error.message);
+            const feedbackFormEl = document.getElementById('feedbackForm');
+            if (feedbackFormEl) feedbackFormEl.style.display = 'none';
+            const loadingOverlayEl = document.getElementById('loading-overlay');
+            if (loadingOverlayEl) loadingOverlayEl.style.display = 'none';
+        }
+        
+        let targetUserId = null; 
+        let generatedUserShareId = null; 
+
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const shareLinkSection = document.getElementById('shareLinkSection');
+        const shareableLinkEl = document.getElementById('shareableLink');
+        const userUniqueIdDisplayEl = document.getElementById('userUniqueIdDisplay');
+        const invalidLinkSection = document.getElementById('invalidLinkSection');
+        const invalidLinkMessageEl = document.getElementById('invalidLinkMessage');
+        const feedbackForm = document.getElementById('feedbackForm'); 
+        const contextSelect = document.getElementById('context');
+        const overallInstruction = document.getElementById('overallInstruction');
+        const entryCounterDiv = document.getElementById('entryCounter');
+        const filledCountDisplay = document.getElementById('filledCountDisplay');
+        const strengthsInputsContainer = document.getElementById('strengthsInputsContainer');
+        const weaknessesInputsContainer = document.getElementById('weaknessesInputsContainer');
+        const strengthsCountDisplayEl = document.getElementById('strengthsCountDisplay');
+        const weaknessesCountDisplayEl = document.getElementById('weaknessesCountDisplay');
+        const submitButton = document.getElementById('submitButton');
+
+
+        const contextLabels = {
+            travail: "Travail / Entreprise",
+            formation: "Formation",
+            cours: "Cours",
+            vie_personnelle: "Vie Personnelle"
+        };
+
+        const NUM_INPUTS_PER_CATEGORY = 10; 
+        const TOTAL_ADJECTIVES_REQUIRED = 10; 
+
+        function generateUUID() { 
+            return crypto.randomUUID();
+        }
+        
+        let submitterSessionId = sessionStorage.getItem('submitterSessionId');
+        if (!submitterSessionId) {
+            submitterSessionId = generateUUID();
+            sessionStorage.setItem('submitterSessionId', submitterSessionId);
+        }
+        console.log("Submitter Session ID:", submitterSessionId);
+
+
+        function countFilledInputs() {
+            if (!strengthsInputsContainer || !weaknessesInputsContainer) return 0;
+            const filledStrengthsCount = Array.from(strengthsInputsContainer.querySelectorAll('input'))
+                                         .filter(input => input.value.trim() !== '').length;
+            const filledWeaknessesCount = Array.from(weaknessesInputsContainer.querySelectorAll('input'))
+                                          .filter(input => input.value.trim() !== '').length;
+            return filledStrengthsCount + filledWeaknessesCount;
+        }
+
+        function updateEntryCounter() {
+            if (!contextSelect || contextSelect.value === "") { 
+                if(entryCounterDiv) entryCounterDiv.style.display = 'none';
+                return;
+            }
+            if(entryCounterDiv) entryCounterDiv.style.display = 'block';
+            const totalFilled = countFilledInputs();
+            if(filledCountDisplay) filledCountDisplay.textContent = totalFilled;
+
+            if (totalFilled > TOTAL_ADJECTIVES_REQUIRED) {
+                if(filledCountDisplay) {
+                    filledCountDisplay.classList.add('count-error');
+                    filledCountDisplay.classList.remove('count-valid');
+                }
+                if(entryCounterDiv) {
+                    entryCounterDiv.classList.add('bg-red-50', 'border', 'border-red-200');
+                    entryCounterDiv.classList.remove('bg-green-50', 'border-green-200', 'bg-indigo-50', 'border-indigo-200');
+                }
+            } else if (totalFilled === TOTAL_ADJECTIVES_REQUIRED) {
+                 if(filledCountDisplay) {
+                    filledCountDisplay.classList.add('count-valid');
+                    filledCountDisplay.classList.remove('count-error');
+                }
+                if(entryCounterDiv) {
+                    entryCounterDiv.classList.add('bg-green-50', 'border', 'border-green-200');
+                    entryCounterDiv.classList.remove('bg-red-50', 'border-red-200', 'bg-indigo-50', 'border-indigo-200');
+                }
+            } else {
+                if(filledCountDisplay) {
+                    filledCountDisplay.classList.remove('count-error', 'count-valid');
+                }
+                if(entryCounterDiv) {
+                    entryCounterDiv.classList.add('bg-indigo-50', 'border', 'border-indigo-200');
+                    entryCounterDiv.classList.remove('bg-red-50', 'border-red-200', 'bg-green-50', 'border-green-200');
+                }
+            }
+        }
+
+        function updateAdjectiveInputs(selectedContextValue) {
+            if(strengthsInputsContainer) strengthsInputsContainer.innerHTML = '';
+            if(weaknessesInputsContainer) weaknessesInputsContainer.innerHTML = '';
+            updateEntryCounter(); 
+
+            if (!selectedContextValue) {
+                if(strengthsCountDisplayEl) strengthsCountDisplayEl.textContent = `(0 disponibles)`;
+                if(weaknessesCountDisplayEl) weaknessesCountDisplayEl.textContent = `(0 disponibles)`;
+                if(overallInstruction) overallInstruction.style.display = 'none';
+                if(entryCounterDiv) entryCounterDiv.style.display = 'none';
+                if(submitButton) submitButton.disabled = true;
+                return;
+            }
+
+            if(overallInstruction) overallInstruction.style.display = 'block';
+            if(entryCounterDiv) entryCounterDiv.style.display = 'block';
+            if(strengthsCountDisplayEl) strengthsCountDisplayEl.textContent = `(${NUM_INPUTS_PER_CATEGORY} disponibles)`;
+            if(weaknessesCountDisplayEl) weaknessesCountDisplayEl.textContent = `(${NUM_INPUTS_PER_CATEGORY} disponibles)`;
+
+            for (let i = 0; i < NUM_INPUTS_PER_CATEGORY; i++) {
+                const strengthInput = document.createElement('input');
+                strengthInput.type = 'text';
+                strengthInput.placeholder = `Atout #${i + 1}`;
+                strengthInput.className = 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2';
+                strengthInput.addEventListener('input', updateEntryCounter);
+                if(strengthsInputsContainer) strengthsInputsContainer.appendChild(strengthInput);
+
+                const weaknessInput = document.createElement('input');
+                weaknessInput.type = 'text';
+                weaknessInput.placeholder = `Point d'amélioration #${i + 1}`;
+                weaknessInput.className = 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2';
+                weaknessInput.addEventListener('input', updateEntryCounter);
+                if(weaknessesInputsContainer) weaknessesInputsContainer.appendChild(weaknessInput);
+            }
+            if(submitButton) submitButton.disabled = false;
+            updateEntryCounter(); 
+        }
+
+        if(contextSelect) {
+            contextSelect.addEventListener('change', (event) => {
+                updateAdjectiveInputs(event.target.value);
+            });
+        }
+        
+        if(feedbackForm) {
+            feedbackForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                if (!supabaseClient) { 
+                    showModal("Erreur Critique", "Client Supabase non initialisé. Impossible de soumettre.");
+                    return;
+                }
+                if(submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<div class="spinner !w-5 !h-5 !border-2 !m-0 inline-block mr-2"></div>Envoi en cours...';
+                }
+
+                if (!targetUserId) {
+                    showModal("Erreur", "Aucun destinataire spécifié pour ce feedback. Le lien est peut-être incorrect.");
+                    if(submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Soumettre le Feedback';
+                    }
+                    return;
+                }
+
+                const contextValue = contextSelect ? contextSelect.value : "";
+                if (!contextValue) {
+                    showModal("Information Manquante", "Veuillez choisir un contexte.");
+                    if(submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Soumettre le Feedback';
+                    }
+                    return;
+                }
+
+                const filledStrengths = strengthsInputsContainer ? Array.from(strengthsInputsContainer.querySelectorAll('input'))
+                                     .map(input => input.value.trim())
+                                     .filter(value => value) : []; 
+                const filledWeaknesses = weaknessesInputsContainer ? Array.from(weaknessesInputsContainer.querySelectorAll('input'))
+                                       .map(input => input.value.trim())
+                                       .filter(value => value) : []; 
+
+                const totalFilledCount = filledStrengths.length + filledWeaknesses.length;
+
+                if (totalFilledCount !== TOTAL_ADJECTIVES_REQUIRED) {
+                     showModal("Validation Échouée", `Veuillez fournir un total exact de ${TOTAL_ADJECTIVES_REQUIRED} descriptions (atouts et/ou faiblesses). Vous en avez actuellement fourni ${totalFilledCount}.`);
+                    if(submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Soumettre le Feedback';
+                    }
+                    return;
+                }
+
+                try {
+                    const { data, error } = await supabaseClient 
+                        .from('feedback_responses') 
+                        .insert([
+                            { 
+                                target_user_id: targetUserId,
+                                context: contextLabels[contextValue] || contextValue, 
+                                strengths: filledStrengths,
+                                weaknesses: filledWeaknesses,
+                                submitter_session_id: submitterSessionId
+                            }
+                        ]);
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    console.log("Feedback soumis avec succès:", data);
+                    showModal("Merci !", "Votre feedback a été soumis avec succès et de manière anonyme.");
+                    if(feedbackForm) feedbackForm.reset(); 
+                    updateAdjectiveInputs(""); 
+                    if(contextSelect) contextSelect.value = ""; 
+                    if(overallInstruction) overallInstruction.style.display = 'none';
+                    if(entryCounterDiv) entryCounterDiv.style.display = 'none'; 
+                } catch (error) {
+                    console.error("Erreur de soumission à Supabase: ", error);
+                    showModal("Erreur de Soumission", "Une erreur est survenue lors de la soumission à Supabase. Vérifiez la console pour les détails et assurez-vous que RLS est configuré. <br>Détails: " + error.message);
+                } finally {
+                    if(submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Soumettre le Feedback';
+                    }
+                }
+            });
+        }
+
+        function main() {
+            if (!supabaseClient) { 
+                if(loadingOverlay) loadingOverlay.style.display = 'none';
+                return; 
+            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const formForIdFromUrl = urlParams.get('formFor'); 
+
+            if (formForIdFromUrl) { 
+                targetUserId = formForIdFromUrl;
+                console.log(`Formulaire pour donner du feedback à l'utilisateur : ${targetUserId}`);
+                if(shareLinkSection) shareLinkSection.style.display = 'none';
+                if(invalidLinkSection) invalidLinkSection.style.display = 'none';
+                if(feedbackForm) feedbackForm.style.display = 'block';
+            } else { 
+                generatedUserShareId = generateUUID(); 
+                targetUserId = generatedUserShareId; 
+                
+                console.log(`L'utilisateur veut obtenir son lien partageable. Son ID généré est : ${generatedUserShareId}.`);
+                const shareUrl = `${window.location.origin}${window.location.pathname}?formFor=${generatedUserShareId}`;
+                if(shareableLinkEl) shareableLinkEl.textContent = shareUrl;
+                if(userUniqueIdDisplayEl) userUniqueIdDisplayEl.textContent = generatedUserShareId;
+                if(shareLinkSection) shareLinkSection.style.display = 'block';
+                if(invalidLinkSection) invalidLinkSection.style.display = 'none'; 
+                if(feedbackForm) feedbackForm.style.display = 'block'; 
+                
+                const parentOfFeedbackForm = feedbackForm ? feedbackForm.parentNode : null;
+                if (parentOfFeedbackForm) {
+                    const existingTestMessage = parentOfFeedbackForm.querySelector('.test-message-feedback');
+                    if (!existingTestMessage) {
+                        const testMessage = document.createElement('p');
+                        testMessage.className = 'text-sm text-gray-600 bg-yellow-50 p-3 rounded-md mb-4 border border-yellow-300 test-message-feedback';
+                        testMessage.innerHTML = `Utilisez le formulaire ci-dessous pour tester la soumission de feedback pour vous-même. Les réponses iront à votre propre identifiant généré (<strong>${generatedUserShareId}</strong>). Partagez le lien ci-dessus avec vos collègues.`;
+                        parentOfFeedbackForm.insertBefore(testMessage, feedbackForm);
+                    }
+                }
+            }
+            updateAdjectiveInputs(contextSelect ? contextSelect.value : ""); 
+            if(loadingOverlay) loadingOverlay.style.display = 'none';
+        }
+
+        if (supabaseClient) {
+            main();
+        } else {
+            if(loadingOverlay) loadingOverlay.style.display = 'none';
+            const errorModal = document.getElementById('messageModal'); 
+            const errorInvalidSection = document.getElementById('invalidLinkSection'); 
+
+            if (errorModal && errorModal.style.display !== 'block' &&
+                errorInvalidSection && errorInvalidSection.style.display !== 'block') {
+                 showModal("Erreur Critique", "Le client Supabase n'a pas pu être initialisé. Le formulaire ne peut pas fonctionner.");
+            }
+        }
+    </script>
+</body>
 </html>
